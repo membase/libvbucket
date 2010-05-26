@@ -1,6 +1,6 @@
 /* -*- Mode: C; tab-width: 4; c-basic-offset: 4; indent-tabs-mode: nil -*- */
-#ifndef VBUCKET_H
-#define VBUCKET_H 1
+#ifndef LIBVBUCKET_VBUCKET_H
+#define LIBVBUCKET_VBUCKET_H 1
 
 #include <stddef.h>
 #include "visibility.h"
