@@ -5,6 +5,10 @@
 #include <stddef.h>
 #include "visibility.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef void* VBUCKET_CONFIG_HANDLE;
 
 /* Creation and destruction */
@@ -36,5 +40,9 @@ LIBVBUCKET_PUBLIC_API
 int vbucket_get_master(VBUCKET_CONFIG_HANDLE h, int id);
 LIBVBUCKET_PUBLIC_API
 int vbucket_get_replica(VBUCKET_CONFIG_HANDLE h, int id, int n);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
