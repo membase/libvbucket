@@ -19,14 +19,14 @@ TESTS = ${check_PROGRAMS}
 # Test application to test stuff from C
 testapp_SOURCES = tests/testapp.c
 testapp_DEPENDENCIES= libvbucket.la
-testapp_LDADD= libvbucket.la ${LIBHASHKIT}
+testapp_LDADD= libvbucket.la ${LTLIBHASHKIT}
 
 libvbucket_la_SOURCES= \
                         src/cJSON.c \
                         src/cJSON.h \
                         src/vbucket.c
 libvbucket_la_LDFLAGS=
-libvbucket_la_LIBADD= ${LIBHASHKIT}
+libvbucket_la_LIBADD= ${LTLIBHASHKIT}
 
 
 test: check-TESTS
