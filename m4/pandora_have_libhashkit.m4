@@ -21,7 +21,8 @@ AC_DEFUN([_PANDORA_SEARCH_LIBHASHKIT],[
       #include <stdlib.h>
       #include <libhashkit/hashkit.h>
     ],[
-      hashkit_st *kit = hashkit_create(NULL);
+      hashkit_st foo;
+      hashkit_st *kit = hashkit_create(&foo);
       hashkit_free(kit);
     ])
   ],[
