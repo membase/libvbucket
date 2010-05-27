@@ -67,7 +67,7 @@ static hashkit_hash_algorithm_t lookup_hash_algorithm(const char *s) {
     hashes[HASHKIT_HASH_HSIEH] = "hsieh";
     hashes[HASHKIT_HASH_MURMUR] = "murmur";
     hashes[HASHKIT_HASH_JENKINS] = "jenkins";
-    for (int i = 0; i < sizeof(hashes); ++i) {
+    for (unsigned int i = 0; i < sizeof(hashes); ++i) {
         if (hashes[i] != NULL && strcasecmp(s, hashes[i]) == 0) {
             return i;
         }
@@ -243,7 +243,7 @@ VBUCKET_CONFIG_HANDLE vbucket_config_parse_file(const char *filename) {
     }
     size_t nread = fread(data, sizeof(char), size+1, f);
     fclose(f);
-    if (nread != size) {
+    if (nread != (size_t)size) {
         free(data);
         return NULL;
     }
