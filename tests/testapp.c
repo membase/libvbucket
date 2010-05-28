@@ -51,7 +51,7 @@ static const struct vb_st vbuckets[] =
     { 1, { 2, 0 } }
 };
 
-int main() {
+int main(void) {
     VBUCKET_CONFIG_HANDLE vb = vbucket_config_parse_string(config);
     if (vb == NULL) {
         fprintf(stderr, "vbucket_config_parse_string error: %s\n", vbucket_get_error());
