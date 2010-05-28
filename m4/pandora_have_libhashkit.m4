@@ -18,7 +18,6 @@ AC_DEFUN([_PANDORA_SEARCH_LIBHASHKIT],[
 
   AS_IF([test "x$ac_enable_libhashkit" = "xyes"],[
     AC_LIB_HAVE_LINKFLAGS(hashkit,,[
-      #include <stdlib.h>
       #include <libhashkit/hashkit.h>
     ],[
       hashkit_st foo;
