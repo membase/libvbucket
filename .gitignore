@@ -1,4 +1,7 @@
 # Keep the entries sorted to reduce the risk for a merge conflict
+*.3lib
+*.3vbucket
+*.4
 *.[ao]
 *.dirstamp
 *.l[ao]

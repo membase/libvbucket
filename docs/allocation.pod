@@ -1,0 +1,43 @@
+=head1 NAME
+
+vbucket_config_parse_file, vbucket_config_parse_string, vbucket_config_destroy
+
+=head1 SYNOPSIS
+
+#include <libvbucket/vbucket.h>
+
+VBUCKET_CONFIG_HANDLE vbucket_config_parse_file(const char *filename);
+
+VBUCKET_CONFIG_HANDLE vbucket_config_parse_string(const char *data);
+
+void vbucket_config_destroy(VBUCKET_CONFIG_HANDLE handle);
+
+=head1 DESCRIPTION
+
+The vbucket_config_parse_string function tries to parse the
+null-terminated character sequence pointed to by data and creates a
+VBUCKET_CONFIG_HANDLE. See libvbucket(4) for information of the
+content of the stream.
+
+vbucket_config_parse_file is similar to
+vbucket_config_parse_string but read the data to parse from the
+file whose pathname is the string pointed to by filename. See
+libvbucket(4) for information of the syntax of the content of the
+file.
+
+vbucket_config_destroy is used to invalidate the
+VBUCKET_CONFIG_HANDLE returned by vbucket_config_parse_stringq and
+vbucket_config_parse_file.
+
+=head1 RETURN
+
+vbucket_config_parse_file and vbucket_config_parse_string returns a
+pointer to a VBUCKET_CONFIG_HANDLE on success, or NULL if an error
+occurred. Extra error information can be obtained with
+vbucket_get_error(3vbucket).
+
+=head1 SEE ALSO
+
+libvbucket(3lib) libvbucket(4) vbucket_get_error(3vbucket) vbucket_config_get_num_replicas(3vbucket) vbucket_config_get_num_vbuckets(3vbucket) vbucket_config_get_num_servers(3vbucket) vbucket_config_get_server(3vbucket) vbucket_get_vbucket_by_key(3vbucket) vbucket_get_master(3vbucket) vbucket_get_replica(3vbucket)
+
+=cut

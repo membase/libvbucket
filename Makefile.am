@@ -11,6 +11,63 @@ pkginclude_HEADERS = \
                      include/libvbucket/vbucket.h \
                      include/libvbucket/visibility.h
 
+man_MANS = libvbucket.3lib \
+           libvbucket.4 \
+           vbucket_config_destroy.3vbucket \
+           vbucket_config_get_num_replicas.3vbucket \
+           vbucket_config_get_num_servers.3vbucket \
+           vbucket_config_get_num_vbuckets.3vbucket \
+           vbucket_config_get_server.3vbucket \
+           vbucket_config_parse_file.3vbucket \
+           vbucket_config_parse_string.3vbucket \
+           vbucket_get_error.3vbucket \
+           vbucket_get_master.3vbucket \
+           vbucket_get_replica.3vbucket \
+           vbucket_get_vbucket_by_key.3vbucket
+
+CLEANFILES= ${man_MANS}
+
+libvbucket.3lib: docs/libvbucket.pod
+	${POD2MAN} -c "$*" -r "" -s 3lib $< $@
+
+libvbucket.4: docs/fileformat.pod
+	${POD2MAN} -c "$*" -r "" -s 4 $< $@
+
+vbucket_config_parse_file.3vbucket: docs/allocation.pod
+	${POD2MAN} -c "$*" -r "" -s 3lib $< $@
+
+vbucket_config_parse_string.3vbucket: docs/allocation.pod
+	${POD2MAN} -c "$*" -r "" -s 3lib $< $@
+
+vbucket_config_destroy.3vbucket: docs/allocation.pod
+	${POD2MAN} -c "$*" -r "" -s 3lib $< $@
+
+vbucket_get_error.3vbucket: docs/misc.pod
+	${POD2MAN} -c "$*" -r "" -s 3lib $< $@
+
+vbucket_config_get_num_replicas.3vbucket: docs/config.pod
+	${POD2MAN} -c "$*" -r "" -s 3lib $< $@
+
+vbucket_config_get_num_vbuckets.3vbucket: docs/config.pod
+	${POD2MAN} -c "$*" -r "" -s 3lib $< $@
+
+vbucket_config_get_num_servers.3vbucket: docs/config.pod
+	${POD2MAN} -c "$*" -r "" -s 3lib $< $@
+
+vbucket_config_get_server.3vbucket: docs/config.pod
+	${POD2MAN} -c "$*" -r "" -s 3lib $< $@
+
+vbucket_get_vbucket_by_key.3vbucket: docs/vbucket.pod
+	${POD2MAN} -c "$*" -r "" -s 3lib $< $@
+
+vbucket_get_master.3vbucket: docs/vbucket.pod
+	${POD2MAN} -c "$*" -r "" -s 3lib $< $@
+
+vbucket_get_replica.3vbucket: docs/vbucket.pod
+	${POD2MAN} -c "$*" -r "" -s 3lib $< $@
+
+
+
 lib_LTLIBRARIES = libvbucket.la
 
 check_PROGRAMS= testapp

@@ -1,0 +1,105 @@
+=head1 NAME
+
+libvbucket - libvbucket "file" format
+
+=head1 DESCRIPTION
+
+libvbucket use JSON for it's configuratin format. The stream contains
+the following sections:
+
+=over 2
+
+=item hashAlgorithm
+
+The hash algorithm can be in upper or lower case. Libvbucket currently
+supports the following hash algorithms (via libhashkit):
+
+=over
+
+=item *
+
+default - this is libhashkit's default of one_at_a_time
+
+=item *
+
+md5
+
+=item *
+
+crc - this is CRC32, a good general purpose hash for short strings
+
+=item *
+
+fnv1_64
+
+=item *
+
+fnv1a_64
+
+=item *
+
+fnv1_32
+
+=item *
+
+fnv1a_32
+
+=item *
+
+hsieh
+
+=item *
+
+murmur
+
+=item *
+
+jenkins
+
+=back
+
+=item numReplicas
+
+numReplicas is the number of extra copies that will be stored on
+servers. Each vBucket in vBucketMap must have this number of server
+indexes plus one (the master server).
+
+=item serverList
+
+This has one string per server, in whatever format your app expects a
+server config string in. This may change to be more structured later.
+
+=item vBucketMap
+
+This contains one entry per vBucket, and the number of entries must be
+a power of two. Each entry must be an array of numReplicas+1
+zero-based indices into serverList, with the first entry indicating
+the master server for the bucket and the remaining entries specifying
+the replicas, in order. -1 indicates that no server is mapped for that
+particular master/replica of that particular vBucket.
+
+In the future this will probably be extended to support "intermediate
+states" of vBuckets which are being migrated.
+
+=back
+
+EXAMPLE:
+    {
+      "hashAlgorithm": "CRC",
+      "numReplicas": 2,
+      "serverList": ["server1:11211", "server2:11210", "server3:11211"],
+      "vBucketMap":
+        [
+          [0, 1, 2],
+          [1, 2, 0],
+          [2, 1, -1],
+          [1, 2, 0]
+        ]
+    }
+
+
+=head1 SEE ALSO
+
+libvbucket(3lib) vbucket_config_parse_file(3vbucket) vbucket_config_parse_string(3vbucket) vbucket_config_destroy(3vbucket) vbucket_get_error(3vbucket) vbucket_config_get_num_replicas(3vbucket) vbucket_config_get_num_vbuckets(3vbucket) vbucket_config_get_num_servers(3vbucket) vbucket_config_get_server(3vbucket)
+
+=cut

@@ -1,0 +1,51 @@
+=head1 NAME
+
+vbucket_config_get_num_replicas, vbucket_config_get_num_vbuckets, vbucket_config_get_num_servers, vbucket_config_get_server
+
+=head1 SYNOPSIS
+
+#include <libvbucket/vbucket.h>
+
+int vbucket_config_get_num_replicas(VBUCKET_CONFIG_HANDLE handle);
+
+int vbucket_config_get_num_vbuckets(VBUCKET_CONFIG_HANDLE handle);
+
+int vbucket_config_get_num_servers(VBUCKET_CONFIG_HANDLE handle);
+
+const char *vbucket_config_get_server(VBUCKET_CONFIG_HANDLE handle, int server_index);
+
+=head1 DESCRIPTION
+
+The following functions returns information from the vbucket configuration.
+
+=over 2
+=item vbucket_config_get_num_replicas
+
+=item vbucket_config_get_num_vbuckets
+
+=item vbucket_config_get_num_servers
+
+=item vbucket_config_get_server
+
+=back
+
+=head1 RETURN
+
+vbucket_config_get_num_replicas returns the number of replicas that
+should be available for each item in the system.
+
+vbucket_config_get_num_vbuckets returns the total number of vbuckets
+within the system.
+
+vbucket_config_get_num_servers returns the number of servers defined
+within the system.
+
+vbucket_config_get_server returns a textuals string indentifying the
+server with "hostname:port". NULL is returned if the index cannot be
+found.
+
+=head1 SEE ALSO
+
+libvbucket(3lib) libvbucket(4) vbucket_config_parse_file(3vbucket) vbucket_config_parse_string(3vbucket) vbucket_config_destroy(3vbucket) vbucket_get_error(3vbucket) vbucket_get_vbucket_by_key(3vbucket) vbucket_get_master(3vbucket) vbucket_get_replica(3vbucket)
+
+=cut

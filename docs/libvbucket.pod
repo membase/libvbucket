@@ -1,0 +1,82 @@
+=head1 NAME
+
+libvbucket - library for virtual buckets mapping
+
+=head1 SYNOPSIS
+
+cc [ flag... ] file... -lvbucket [ library...]
+
+#include <libvbucket/vbucket.h>
+
+=head1 DESCRIPTION
+
+Functions in this library provide routines that provide a mapping between
+keys, virtual buckets and the host that serves the virtual buckets.
+
+=head1 INTERFACES
+
+The shared object libvbucket.so provides the public interfaces defined
+below. See intro(3) for additional information on shared object interfaces.
+
+=over 2
+=item vbucket_config_parse_file
+
+=item vbucket_config_parse_string
+
+=item vbucket_config_destroy
+
+=item vbucket_get_error
+
+=item vbucket_config_get_num_replicas
+
+=item vbucket_config_get_num_vbuckets
+
+=item vbucket_config_get_num_servers
+
+=item vbucket_config_get_server
+
+=item vbucket_get_vbucket_by_key
+
+=item vbucket_get_master
+
+=item vbucket_get_replica
+
+=back
+
+=head1 EXAMPLE
+
+#include <libvbucket/vbucket.h>
+
+int main(int argc, char **argv) {
+    [ ... cut ... ]
+
+    VBUCKET_CONFIG_HANDLE handle;
+
+    handle = vbucket_config_parse_file(filename);
+    if (handle == NULL) {
+       fprintf(stderr, "Failed to parse vbucket config: %s\n",
+	       vbucket_get_error());
+       return 1;
+    }
+
+    int serverindex = vbucket_get_master(handle, bucketid);
+    if (serverindex == -1) {
+       fprintf(stderr, "No information found for the requested bucket id\n");
+       vbucket_config_destroy(handle);
+       return 1;
+    }
+
+    fprintf(stderr, "Bucket %d is served by %s\n", bucketid,
+            vbucket_config_get_server(handle, serverindex));
+
+    vbucket_config_destroy(handle);
+
+    return 0;
+}
+
+=head1 SEE ALSO
+
+libvbucket(4) vbucket_config_parse_file(3vbucket) vbucket_config_parse_string(3vbucket) vbucket_config_destroy(3vbucket) vbucket_get_error(3vbucket) vbucket_config_get_num_replicas(3vbucket) vbucket_config_get_num_vbuckets(3vbucket) vbucket_config_get_num_servers(3vbucket) vbucket_config_get_server(3vbucket) vbucket_get_vbucket_by_key(3vbucket) vbucket_get_master(3vbucket) vbucket_get_replica(3vbucket)
+
+=cut
+

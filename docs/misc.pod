@@ -1,0 +1,23 @@
+=head1 NAME
+
+vbucket_get_error
+
+=head1 SYNOPSIS
+
+#include <libvbucket/vbucket.h>
+
+const char *vbucket_get_error(void);
+
+=head1 DESCRIPTION
+
+Get the error message from the previous call to any of the libvbucket(3lib) call.
+
+=head1 RETURN
+
+A pointer to the error message
+
+=head1 SEE ALSO
+
+libvbucket(3lib) libvbucket(4) vbucket_config_parse_file(3vbucket) vbucket_config_parse_string(3vbucket) vbucket_config_destroy(3vbucket) vbucket_config_get_num_replicas(3vbucket) vbucket_config_get_num_vbuckets(3vbucket) vbucket_config_get_num_servers(3vbucket) vbucket_config_get_server(3vbucket) vbucket_get_vbucket_by_key(3vbucket) vbucket_get_master(3vbucket) vbucket_get_replica(3vbucket)
+
+=cut

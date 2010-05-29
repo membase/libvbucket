@@ -1,0 +1,44 @@
+=head1 NAME
+
+vbucket_get_vbucket_by_key vbucket_get_master vbucket_get_replica
+
+
+=head1 SYNOPSIS
+
+#include <libvbucket/vbucket.h>
+
+int vbucket_get_vbucket_by_key(VBUCKET_CONFIG_HANDLE h, const void *key, size_t nkey);
+
+int vbucket_get_master(VBUCKET_CONFIG_HANDLE h, int id);
+
+int vbucket_get_replica(VBUCKET_CONFIG_HANDLE h, int id, int n);
+
+=head1 DESCRIPTION
+
+The function vbucket_get_vbucket_by_key is used to locate the vbucket
+a given key belongs to.
+
+The function vbucket_get_master is used to locate the server
+responsible for the "master copy" of an item.
+
+The function vbucket_get_replica is used to locate the server
+responsible for the given replica of an item.
+
+=head1 RETURN
+
+vbucket_get_vbucket_by_key returns the vbucket the specified key belongs in.
+
+bucket_get_master returns the server index for the
+server responsible for the "master copy" of an item.
+
+vbucket_get_replica returns the server index for the
+server responsible for the given replica of an item.
+
+See vbucket_config_get_server(3vbucket) for how to get the server name
+for a given server index.
+
+=head1 SEE ALSO
+
+libvbucket(3lib) libvbucket(4) vbucket_config_parse_file(3vbucket) vbucket_config_parse_string(3vbucket) vbucket_config_destroy(3vbucket) vbucket_get_error(3vbucket) vbucket_config_get_num_replicas(3vbucket) vbucket_config_get_num_vbuckets(3vbucket) vbucket_config_get_num_servers(3vbucket) vbucket_config_get_server(3vbucket)
+
+=cut
