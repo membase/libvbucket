@@ -1,3 +1,4 @@
+/* -*- Mode: C; tab-width: 4; c-basic-offset: 4; indent-tabs-mode: nil -*- */
 /*
  *     Copyright 2010 NorthScale, Inc.
  *
@@ -29,7 +30,6 @@
 #include "cJSON.h"
 #include <libvbucket/vbucket.h>
 
-#define ERRBUF_SIZE 1024
 #define MAX_CONFIG_SIZE 100 * 1048576
 #define MAX_BUCKETS 65536
 #define MAX_REPLICAS 4
@@ -228,6 +228,7 @@ VBUCKET_CONFIG_HANDLE vbucket_config_parse_string(const char *data) {
 VBUCKET_CONFIG_HANDLE vbucket_config_parse_file(const char *filename) {
     FILE *f = fopen(filename, "r");
     if (f == NULL) {
+        errstr = "Unable to open file";
         return NULL;
     }
     fseek(f, 0, SEEK_END);
@@ -235,16 +236,19 @@ VBUCKET_CONFIG_HANDLE vbucket_config_parse_file(const char *filename) {
     fseek(f, 0, SEEK_SET);
     if (size > MAX_CONFIG_SIZE) {
         fclose(f);
+        errstr = "File too large";
         return NULL;
     }
     char *data = calloc(sizeof(char), size+1);
     if (data == NULL) {
+        errstr = "Unable to allocate buffer to read file";
         return NULL;
     }
     size_t nread = fread(data, sizeof(char), size+1, f);
     fclose(f);
     if (nread != (size_t)size) {
         free(data);
+        errstr = "Failed to read entire file";
         return NULL;
     }
     VBUCKET_CONFIG_HANDLE h = vbucket_config_parse_string(data);
