@@ -155,6 +155,11 @@ static int populate_buckets(struct vbucket_config_st *vb, cJSON *c) {
 }
 
 static VBUCKET_CONFIG_HANDLE parse_cjson(cJSON *c) {
+    cJSON *body = cJSON_GetObjectItem(c, "vbucketServerMap");
+    if (body != NULL) {
+        return parse_cjson(body); // Allows clients to have a JSON envelope.
+    }
+
     cJSON *jHashAlgorithm = cJSON_GetObjectItem(c, "hashAlgorithm");
     if (jHashAlgorithm == NULL || jHashAlgorithm->type != cJSON_String) {
         errstr = "Expected string for hashAlgorithm";

@@ -19,6 +19,23 @@ static const char *config =
 "    ]\n"
 "}";
 
+static const char *configInEnvelope =
+"{ \"otherKeyThatIsIgnored\": 12345,\n"
+  "\"vbucketServerMap\": \n"
+    "{\n"
+    "  \"hashAlgorithm\": \"CRC\",\n"
+    "  \"numReplicas\": 2,\n"
+    "  \"serverList\": [\"server1:11211\", \"server2:11210\", \"server3:11211\"],\n"
+    "  \"vBucketMap\":\n"
+    "    [\n"
+    "      [0, 1, 2],\n"
+    "      [1, 2, 0],\n"
+    "      [2, 1, -1],\n"
+    "      [1, 2, 0]\n"
+    "    ]\n"
+    "}"
+"}";
+
 struct key_st {
     char *key;
     int vbucket;
@@ -51,8 +68,8 @@ static const struct vb_st vbuckets[] =
     { 1, { 2, 0 } }
 };
 
-int main(void) {
-    VBUCKET_CONFIG_HANDLE vb = vbucket_config_parse_string(config);
+static void testConfig(const char *c) {
+    VBUCKET_CONFIG_HANDLE vb = vbucket_config_parse_string(c);
     if (vb == NULL) {
         fprintf(stderr, "vbucket_config_parse_string error: %s\n", vbucket_get_error());
         abort();
@@ -89,4 +106,10 @@ int main(void) {
 
     vbucket_config_destroy(vb);
 }
+
+int main(void) {
+  testConfig(config);
+  testConfig(configInEnvelope);
+}
+
 
