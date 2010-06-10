@@ -19,6 +19,20 @@ static const char *config =
 "    ]\n"
 "}";
 
+static const char *configFlat =
+"{"
+"  \"hashAlgorithm\": \"CRC\","
+"  \"numReplicas\": 2,"
+"  \"serverList\": [\"server1:11211\", \"server2:11210\", \"server3:11211\"],"
+"  \"vBucketMap\":"
+"    ["
+"      [0, 1, 2],"
+"      [1, 2, 0],"
+"      [2, 1, -1],"
+"      [1, 2, 0]"
+"    ]"
+"}";
+
 static const char *configInEnvelope =
 "{ \"otherKeyThatIsIgnored\": 12345,\n"
   "\"vbucketServerMap\": \n"
@@ -35,6 +49,30 @@ static const char *configInEnvelope =
     "    ]\n"
     "}"
 "}";
+
+static const char *configInEnvelope2 =
+"{\"name\":\"default\",\"uri\":\"/pools/default/buckets/default\","
+ "\"streamingUri\":\"/pools/default/bucketsStreaming/default\","
+ "\"flushCacheUri\":\"/pools/default/buckets/default/controller/doFlush\","
+ "\"nodes\":[{\"clusterMembership\":\"inactiveAdded\",\"status\":\"unhealthy\","
+             "\"hostname\":\"127.0.0.1\",\"version\":\"unknown\",\"os\":\"unknown\","
+             "\"ports\":{\"proxy\":11213,\"direct\":11212},"
+             "\"uptime\":\"0\",\"memoryTotal\":0,\"memoryFree\":0,\"mcdMemoryReserved\":64,\"mcdMemoryAllocated\":0}],"
+ "\"stats\":{\"uri\":\"/pools/default/buckets/default/stats\"},"
+ "\"vbucketServerMap\": "
+    "{"
+    "  \"hashAlgorithm\": \"CRC\","
+    "  \"numReplicas\": 2,"
+    "  \"serverList\": [\"server1:11211\", \"server2:11210\", \"server3:11211\"],"
+    "  \"vBucketMap\":"
+    "    ["
+    "      [0, 1, 2],"
+    "      [1, 2, 0],"
+    "      [2, 1, -1],"
+    "      [1, 2, 0]"
+    "    ]"
+ "},"
+ "\"basicStats\":{\"cacheSize\":64,\"opsPerSec\":0.0,\"evictionsPerSec\":0.0,\"cachePercentUsed\":0.0}}";
 
 struct key_st {
     char *key;
@@ -109,7 +147,9 @@ static void testConfig(const char *c) {
 
 int main(void) {
   testConfig(config);
+  testConfig(configFlat);
   testConfig(configInEnvelope);
+  testConfig(configInEnvelope2);
 }
 
 

@@ -210,7 +210,6 @@ static VBUCKET_CONFIG_HANDLE parse_cjson(cJSON *c) {
         return NULL;
     }
 
-
     if (populate_buckets(vb, jBuckets) != 0) {
         vbucket_config_destroy(vb);
         return NULL;
