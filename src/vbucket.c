@@ -155,7 +155,7 @@ static int populate_buckets(struct vbucket_config_st *vb, cJSON *c) {
 }
 
 static VBUCKET_CONFIG_HANDLE parse_cjson(cJSON *c) {
-    cJSON *body = cJSON_GetObjectItem(c, "vbucketServerMap");
+    cJSON *body = cJSON_GetObjectItem(c, "vBucketServerMap");
     if (body != NULL) {
         return parse_cjson(body); // Allows clients to have a JSON envelope.
     }

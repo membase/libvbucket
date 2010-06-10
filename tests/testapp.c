@@ -35,7 +35,7 @@ static const char *configFlat =
 
 static const char *configInEnvelope =
 "{ \"otherKeyThatIsIgnored\": 12345,\n"
-  "\"vbucketServerMap\": \n"
+  "\"vBucketServerMap\": \n"
     "{\n"
     "  \"hashAlgorithm\": \"CRC\",\n"
     "  \"numReplicas\": 2,\n"
@@ -59,7 +59,7 @@ static const char *configInEnvelope2 =
              "\"ports\":{\"proxy\":11213,\"direct\":11212},"
              "\"uptime\":\"0\",\"memoryTotal\":0,\"memoryFree\":0,\"mcdMemoryReserved\":64,\"mcdMemoryAllocated\":0}],"
  "\"stats\":{\"uri\":\"/pools/default/buckets/default/stats\"},"
- "\"vbucketServerMap\": "
+ "\"vBucketServerMap\": "
     "{"
     "  \"hashAlgorithm\": \"CRC\","
     "  \"numReplicas\": 2,"
