@@ -15,7 +15,7 @@
  *   limitations under the License.
  */
 
-/*! \mainpage libconflate
+/*! \mainpage libvbucket
  *
  * \section intro_sec Introduction
  *
