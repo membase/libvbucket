@@ -24,7 +24,9 @@
 extern "C" {
 #endif
 
-typedef void* VBUCKET_CONFIG_HANDLE;
+struct vbucket_config_st;
+
+typedef struct vbucket_config_st* VBUCKET_CONFIG_HANDLE;
 
 /* Creation and destruction */
 LIBVBUCKET_PUBLIC_API

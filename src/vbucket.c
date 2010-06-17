@@ -107,8 +107,7 @@ static struct vbucket_config_st *config_create(char *hash_algorithm,
     return vb;
 }
 
-void vbucket_config_destroy(VBUCKET_CONFIG_HANDLE h) {
-    struct vbucket_config_st *vb = (struct vbucket_config_st*)h;
+void vbucket_config_destroy(VBUCKET_CONFIG_HANDLE vb) {
     for (int i = 0; i < vb->num_servers; ++i) {
         free(vb->servers[i]);
     }
@@ -260,46 +259,37 @@ VBUCKET_CONFIG_HANDLE vbucket_config_parse_file(const char *filename) {
     return h;
 }
 
-int vbucket_config_get_num_replicas(VBUCKET_CONFIG_HANDLE h) {
-    struct vbucket_config_st *vb = (struct vbucket_config_st*)h;
+int vbucket_config_get_num_replicas(VBUCKET_CONFIG_HANDLE vb) {
     return vb->num_replicas;
 }
 
-int vbucket_config_get_num_vbuckets(VBUCKET_CONFIG_HANDLE h) {
-    struct vbucket_config_st *vb = (struct vbucket_config_st*)h;
+int vbucket_config_get_num_vbuckets(VBUCKET_CONFIG_HANDLE vb) {
     return vb->num_vbuckets;
 }
 
-int vbucket_config_get_num_servers(VBUCKET_CONFIG_HANDLE h) {
-    struct vbucket_config_st *vb = (struct vbucket_config_st*)h;
+int vbucket_config_get_num_servers(VBUCKET_CONFIG_HANDLE vb) {
     return vb->num_servers;
 }
 
-const char *vbucket_config_get_server(VBUCKET_CONFIG_HANDLE h, int i) {
-    struct vbucket_config_st *vb = (struct vbucket_config_st*)h;
+const char *vbucket_config_get_server(VBUCKET_CONFIG_HANDLE vb, int i) {
     return vb->servers[i];
 }
 
-int vbucket_get_vbucket_by_key(VBUCKET_CONFIG_HANDLE h, const void *key, size_t nkey) {
-    struct vbucket_config_st *vb = (struct vbucket_config_st*)h;
+int vbucket_get_vbucket_by_key(VBUCKET_CONFIG_HANDLE vb, const void *key, size_t nkey) {
     uint32_t digest = libhashkit_digest(key, nkey, vb->hk_algorithm);
     return digest & vb->mask;
 }
 
-int vbucket_get_master(VBUCKET_CONFIG_HANDLE h, int vbucket) {
-    struct vbucket_config_st *vb = (struct vbucket_config_st*)h;
+int vbucket_get_master(VBUCKET_CONFIG_HANDLE vb, int vbucket) {
     return vb->vbuckets[vbucket].servers[0];
 }
 
-int vbucket_get_replica(VBUCKET_CONFIG_HANDLE h, int vbucket, int i) {
-    struct vbucket_config_st *vb = (struct vbucket_config_st*)h;
+int vbucket_get_replica(VBUCKET_CONFIG_HANDLE vb, int vbucket, int i) {
     return vb->vbuckets[vbucket].servers[i+1];
 }
 
-int vbucket_found_incorrect_master(VBUCKET_CONFIG_HANDLE h, int vbucket,
+int vbucket_found_incorrect_master(VBUCKET_CONFIG_HANDLE vb, int vbucket,
                                    int wrongserver) {
-    struct vbucket_config_st *vb = (struct vbucket_config_st*)h;
-
     int mappedServer = vb->vbuckets[vbucket].servers[0];
     int rv = mappedServer;
     if (mappedServer == wrongserver) {
