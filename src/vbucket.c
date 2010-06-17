@@ -218,6 +218,7 @@ static VBUCKET_CONFIG_HANDLE parse_cjson(cJSON *c) {
 
 VBUCKET_CONFIG_HANDLE vbucket_config_parse_string(const char *data) {
     cJSON *c = cJSON_Parse(data);
+    errstr = "Failed to parse data";
     if (c == NULL) {
         return NULL;
     }
