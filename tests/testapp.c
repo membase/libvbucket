@@ -170,12 +170,88 @@ static void testWrongServer(const char *c) {
     vbucket_config_destroy(vb);
 }
 
+static void testConfigDiff(void) {
+    const char *cfg1 = "{\n"
+        "  \"hashAlgorithm\": \"CRC\",\n"
+        "  \"numReplicas\": 2,\n"
+        "  \"serverList\": [\"server1:11211\", \"server2:11210\", \"server3:11211\"],\n"
+        "  \"vBucketMap\":\n"
+        "    [\n"
+        "      [0, 1, 2],\n"
+        "      [1, 2, 0],\n"
+        "      [2, 1, -1],\n"
+        "      [1, 2, 0]\n"
+        "    ]\n"
+        "}";
+    const char *cfg2 = "{\n"
+        "  \"hashAlgorithm\": \"CRC\",\n"
+        "  \"numReplicas\": 2,\n"
+        "  \"serverList\": [\"server1:11211\", \"server2:11210\", \"server4:11211\"],\n"
+        "  \"vBucketMap\":\n"
+        "    [\n"
+        "      [0, 1, 2],\n"
+        "      [1, 2, 0],\n"
+        "      [2, 1, -1],\n"
+        "      [0, 2, 0]\n"
+        "    ]\n"
+        "}";
+    const char *cfg3 = "{\n"
+        "  \"hashAlgorithm\": \"CRC\",\n"
+        "  \"numReplicas\": 1,\n"
+        "  \"serverList\": [\"server1:11211\", \"server2:11210\"],\n"
+        "  \"vBucketMap\":\n"
+        "    [\n"
+        "      [0, 1],\n"
+        "      [1, 0],\n"
+        "      [1, 0],\n"
+        "      [0, 1],\n"
+        "      [0, 1],\n"
+        "      [1, 0],\n"
+        "      [1, 0],\n"
+        "      [0, 1]\n"
+        "    ]\n"
+        "}";
+
+    VBUCKET_CONFIG_HANDLE vb1 = vbucket_config_parse_string(cfg1);
+    assert(vb1);
+
+    VBUCKET_CONFIG_HANDLE vb2 = vbucket_config_parse_string(cfg2);
+    assert(vb2);
+
+    VBUCKET_CONFIG_DIFF *diff = vbucket_compare(vb1, vb2);
+    assert(diff);
+
+    assert(diff->sequence_changed);
+    assert(diff->n_vb_changes == 1);
+    assert(strcmp(diff->servers_added[0], "server4:11211") == 0);
+    assert(diff->servers_added[1] == NULL);
+    assert(strcmp(diff->servers_removed[0], "server3:11211") == 0);
+    assert(diff->servers_removed[1] == NULL);
+
+    vbucket_free_diff(diff);
+    vbucket_config_destroy(vb2);
+
+    vb2 = vbucket_config_parse_string(cfg3);
+    assert(vb2);
+
+    diff = vbucket_compare(vb1, vb2);
+    assert(diff);
+
+    assert(diff->sequence_changed);
+    assert(diff->n_vb_changes == -1);
+    assert(diff->servers_added[0] == NULL);
+    assert(strcmp(diff->servers_removed[0], "server3:11211") == 0);
+    assert(diff->servers_removed[1] == NULL);
+
+}
+
 int main(void) {
   testConfig(config);
   testConfig(configFlat);
   testConfig(configInEnvelope);
   testConfig(configInEnvelope2);
   testWrongServer(config);
+  testConfigDiff();
 }
 
 

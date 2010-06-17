@@ -300,3 +300,77 @@ int vbucket_found_incorrect_master(VBUCKET_CONFIG_HANDLE vb, int vbucket,
 
     return rv;
 }
+
+static void compute_vb_list_diff(VBUCKET_CONFIG_HANDLE from,
+                                 VBUCKET_CONFIG_HANDLE to,
+                                 char **out) {
+    int offset = 0;
+    for (int i = 0; i < to->num_servers; i++) {
+        bool found = false;
+        const char *sn = vbucket_config_get_server(to, i);
+        for (int j = 0; !found && j < from->num_servers; j++) {
+            const char *sn2 = vbucket_config_get_server(from, j);
+            found |= (strcmp(sn2, sn) == 0);
+        }
+        if (!found) {
+            out[offset] = strdup(sn);
+            assert(out[offset]);
+            ++offset;
+        }
+    }
+}
+
+VBUCKET_CONFIG_DIFF* vbucket_compare(VBUCKET_CONFIG_HANDLE from,
+                                     VBUCKET_CONFIG_HANDLE to) {
+    VBUCKET_CONFIG_DIFF *rv = calloc(1, sizeof(VBUCKET_CONFIG_DIFF));
+    assert(rv);
+
+    int num_servers = (from->num_servers > to->num_servers
+                       ? from->num_servers : to->num_servers) + 1;
+
+    rv->servers_added = calloc(num_servers, sizeof(char*));
+    rv->servers_removed = calloc(num_servers, sizeof(char*));
+
+    /* Compute the added and removed servers */
+    compute_vb_list_diff(from, to, rv->servers_added);
+    compute_vb_list_diff(to, from, rv->servers_removed);
+
+    /* Verify the servers are equal in their positions */
+    if (to->num_servers == from->num_servers) {
+        rv->sequence_changed = false;
+        for (int i = 0; i < from->num_servers; i++) {
+            rv->sequence_changed |= (0 == strcmp(vbucket_config_get_server(from, i),
+                                                 vbucket_config_get_server(to, i)));
+
+        }
+    } else {
+        /* Just say yes */
+        rv->sequence_changed = true;
+    }
+
+    /* Count the number of vbucket differences */
+    if (to->num_vbuckets == from->num_vbuckets) {
+        for (int i = 0; i < to->num_vbuckets; i++) {
+            rv->n_vb_changes += (vbucket_get_master(from, i)
+                                 == vbucket_get_master(to, i)) ? 0 : 1;
+        }
+    } else {
+        rv->n_vb_changes = -1;
+    }
+
+    return rv;
+}
+
+static void free_array_helper(char **l) {
+    for (int i = 0; l[i]; i++) {
+        free(l[i]);
+    }
+    free(l);
+}
+
+void vbucket_free_diff(VBUCKET_CONFIG_DIFF *diff) {
+    assert(diff);
+    free_array_helper(diff->servers_added);
+    free_array_helper(diff->servers_removed);
+    free(diff);
+}

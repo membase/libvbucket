@@ -32,6 +32,7 @@
  *
  * \defgroup CD Creation and Destruction
  * \defgroup cfg Config Access
+ * \defgroup cfgcmp Config Comparison
  * \defgroup vb VBucket Access
  * \defgroup err Error handling
  */
@@ -40,6 +41,7 @@
 #define LIBVBUCKET_VBUCKET_H 1
 
 #include <stddef.h>
+#include <stdbool.h>
 #include "visibility.h"
 
 #ifdef __cplusplus
@@ -52,6 +54,37 @@ extern "C" {
      * Opaque config representation.
      */
     typedef struct vbucket_config_st* VBUCKET_CONFIG_HANDLE;
+
+    /**
+     * \addtogroup cfgcmp
+     * @{
+     */
+
+    /**
+     * Difference between two vbucket configs.
+     */
+    typedef struct {
+        /**
+         * NULL-terminated list of server names that were added.
+         */
+        char **servers_added;
+        /**
+         * NULL-terminated list of server names that were removed.
+         */
+        char **servers_removed;
+        /**
+         * Number of vbuckets that changed.  -1 if the total number changed
+         */
+        int n_vb_changes;
+        /**
+         * True if the sequence of servers changed.
+         */
+        bool sequence_changed;
+    } VBUCKET_CONFIG_DIFF;
+
+    /**
+     * @}
+     */
 
     /**
      * \addtogroup CD
@@ -195,6 +228,34 @@ extern "C" {
      */
     LIBVBUCKET_PUBLIC_API
     int vbucket_get_replica(VBUCKET_CONFIG_HANDLE h, int id, int n);
+
+    /**
+     * @}
+     */
+
+    /**
+     * \addtogroup cfgcmp
+     * @{
+     */
+
+    /**
+     * Compare two vbucket handles.
+     *
+     * @param from the source vbucket config
+     * @param to the destination vbucket config
+     *
+     * @return what changed between the "from" config and the "to" config
+     */
+    LIBVBUCKET_PUBLIC_API
+    VBUCKET_CONFIG_DIFF* vbucket_compare(VBUCKET_CONFIG_HANDLE from,
+                                         VBUCKET_CONFIG_HANDLE to);
+
+    /**
+     * Free a vbucket diff.
+     *
+     * @param diff the diff to free
+     */
+    void vbucket_free_diff(VBUCKET_CONFIG_DIFF *diff);
 
     /**
      * @}
