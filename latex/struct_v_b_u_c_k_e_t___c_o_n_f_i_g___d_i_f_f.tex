@@ -1,0 +1,71 @@
+\hypertarget{struct_v_b_u_c_k_e_t___c_o_n_f_i_g___d_i_f_f}{
+\section{VBUCKET\_\-CONFIG\_\-DIFF Struct Reference}
+\label{struct_v_b_u_c_k_e_t___c_o_n_f_i_g___d_i_f_f}\index{VBUCKET\_\-CONFIG\_\-DIFF@{VBUCKET\_\-CONFIG\_\-DIFF}}
+}
+
+
+Difference between two vbucket configs.  
+
+
+
+
+{\ttfamily \#include $<$vbucket.h$>$}
+
+\subsection*{Data Fields}
+\begin{DoxyCompactItemize}
+\item 
+char $\ast$$\ast$ \hyperlink{struct_v_b_u_c_k_e_t___c_o_n_f_i_g___d_i_f_f_a9dfbe7534e62b0938d11696f3ae8d970}{servers\_\-added}
+\begin{DoxyCompactList}\small\item\em NULL-\/terminated list of server names that were added. \item\end{DoxyCompactList}\item 
+char $\ast$$\ast$ \hyperlink{struct_v_b_u_c_k_e_t___c_o_n_f_i_g___d_i_f_f_a9a94896717369cad33a7d38b38652526}{servers\_\-removed}
+\begin{DoxyCompactList}\small\item\em NULL-\/terminated list of server names that were removed. \item\end{DoxyCompactList}\item 
+int \hyperlink{struct_v_b_u_c_k_e_t___c_o_n_f_i_g___d_i_f_f_a59f7ed3bc75f0b50128c0f397f3140a4}{n\_\-vb\_\-changes}
+\begin{DoxyCompactList}\small\item\em Number of vbuckets that changed. \item\end{DoxyCompactList}\item 
+bool \hyperlink{struct_v_b_u_c_k_e_t___c_o_n_f_i_g___d_i_f_f_a4b14e6d33d9c4d0c20e6b8dcea3e8cd6}{sequence\_\-changed}
+\begin{DoxyCompactList}\small\item\em True if the sequence of servers changed. \item\end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Difference between two vbucket configs. 
+
+\subsection{Field Documentation}
+\hypertarget{struct_v_b_u_c_k_e_t___c_o_n_f_i_g___d_i_f_f_a59f7ed3bc75f0b50128c0f397f3140a4}{
+\index{VBUCKET\_\-CONFIG\_\-DIFF@{VBUCKET\_\-CONFIG\_\-DIFF}!n\_\-vb\_\-changes@{n\_\-vb\_\-changes}}
+\index{n\_\-vb\_\-changes@{n\_\-vb\_\-changes}!VBUCKET_CONFIG_DIFF@{VBUCKET\_\-CONFIG\_\-DIFF}}
+\subsubsection[{n\_\-vb\_\-changes}]{\setlength{\rightskip}{0pt plus 5cm}int {\bf VBUCKET\_\-CONFIG\_\-DIFF::n\_\-vb\_\-changes}}}
+\label{struct_v_b_u_c_k_e_t___c_o_n_f_i_g___d_i_f_f_a59f7ed3bc75f0b50128c0f397f3140a4}
+
+
+Number of vbuckets that changed. 
+
+-\/1 if the total number changed \hypertarget{struct_v_b_u_c_k_e_t___c_o_n_f_i_g___d_i_f_f_a4b14e6d33d9c4d0c20e6b8dcea3e8cd6}{
+\index{VBUCKET\_\-CONFIG\_\-DIFF@{VBUCKET\_\-CONFIG\_\-DIFF}!sequence\_\-changed@{sequence\_\-changed}}
+\index{sequence\_\-changed@{sequence\_\-changed}!VBUCKET_CONFIG_DIFF@{VBUCKET\_\-CONFIG\_\-DIFF}}
+\subsubsection[{sequence\_\-changed}]{\setlength{\rightskip}{0pt plus 5cm}bool {\bf VBUCKET\_\-CONFIG\_\-DIFF::sequence\_\-changed}}}
+\label{struct_v_b_u_c_k_e_t___c_o_n_f_i_g___d_i_f_f_a4b14e6d33d9c4d0c20e6b8dcea3e8cd6}
+
+
+True if the sequence of servers changed. 
+
+\hypertarget{struct_v_b_u_c_k_e_t___c_o_n_f_i_g___d_i_f_f_a9dfbe7534e62b0938d11696f3ae8d970}{
+\index{VBUCKET\_\-CONFIG\_\-DIFF@{VBUCKET\_\-CONFIG\_\-DIFF}!servers\_\-added@{servers\_\-added}}
+\index{servers\_\-added@{servers\_\-added}!VBUCKET_CONFIG_DIFF@{VBUCKET\_\-CONFIG\_\-DIFF}}
+\subsubsection[{servers\_\-added}]{\setlength{\rightskip}{0pt plus 5cm}char$\ast$$\ast$ {\bf VBUCKET\_\-CONFIG\_\-DIFF::servers\_\-added}}}
+\label{struct_v_b_u_c_k_e_t___c_o_n_f_i_g___d_i_f_f_a9dfbe7534e62b0938d11696f3ae8d970}
+
+
+NULL-\/terminated list of server names that were added. 
+
+\hypertarget{struct_v_b_u_c_k_e_t___c_o_n_f_i_g___d_i_f_f_a9a94896717369cad33a7d38b38652526}{
+\index{VBUCKET\_\-CONFIG\_\-DIFF@{VBUCKET\_\-CONFIG\_\-DIFF}!servers\_\-removed@{servers\_\-removed}}
+\index{servers\_\-removed@{servers\_\-removed}!VBUCKET_CONFIG_DIFF@{VBUCKET\_\-CONFIG\_\-DIFF}}
+\subsubsection[{servers\_\-removed}]{\setlength{\rightskip}{0pt plus 5cm}char$\ast$$\ast$ {\bf VBUCKET\_\-CONFIG\_\-DIFF::servers\_\-removed}}}
+\label{struct_v_b_u_c_k_e_t___c_o_n_f_i_g___d_i_f_f_a9a94896717369cad33a7d38b38652526}
+
+
+NULL-\/terminated list of server names that were removed. 
+
+
+
+The documentation for this struct was generated from the following file:\begin{DoxyCompactItemize}
+\item 
+vbucket.h\end{DoxyCompactItemize}

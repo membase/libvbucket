@@ -1,0 +1,60 @@
+\hypertarget{group___c_d}{
+\section{Creation and Destruction}
+\label{group___c_d}\index{Creation and Destruction@{Creation and Destruction}}
+}
+
+
+VBucket Utility Library.  
+
+
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+VBUCKET\_\-CONFIG\_\-HANDLE \hyperlink{group___c_d_gab07e7f5741db4e787cee43f1c42fd061}{vbucket\_\-config\_\-parse\_\-file} (const char $\ast$filename)
+\begin{DoxyCompactList}\small\item\em Create an instance of vbucket config from a file. \item\end{DoxyCompactList}\item 
+VBUCKET\_\-CONFIG\_\-HANDLE \hyperlink{group___c_d_ga9dbcb358df598b59cb4922b951cb817a}{vbucket\_\-config\_\-parse\_\-string} (const char $\ast$data)
+\begin{DoxyCompactList}\small\item\em Create an instance of vbucket config from a string. \item\end{DoxyCompactList}\item 
+void \hyperlink{group___c_d_gaca045f4151411fd5535f15b169a8c295}{vbucket\_\-config\_\-destroy} (VBUCKET\_\-CONFIG\_\-HANDLE h)
+\begin{DoxyCompactList}\small\item\em Destroy a vbucket config. \item\end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+VBucket Utility Library. 
+
+\subsection{Function Documentation}
+\hypertarget{group___c_d_gaca045f4151411fd5535f15b169a8c295}{
+\index{CD@{CD}!vbucket\_\-config\_\-destroy@{vbucket\_\-config\_\-destroy}}
+\index{vbucket\_\-config\_\-destroy@{vbucket\_\-config\_\-destroy}!CD@{CD}}
+\subsubsection[{vbucket\_\-config\_\-destroy}]{\setlength{\rightskip}{0pt plus 5cm}void vbucket\_\-config\_\-destroy (VBUCKET\_\-CONFIG\_\-HANDLE {\em h})}}
+\label{group___c_d_gaca045f4151411fd5535f15b169a8c295}
+
+
+Destroy a vbucket config. 
+
+
+\begin{DoxyParams}{Parameters}
+\item[{\em h}]the vbucket config handle \end{DoxyParams}
+\hypertarget{group___c_d_gab07e7f5741db4e787cee43f1c42fd061}{
+\index{CD@{CD}!vbucket\_\-config\_\-parse\_\-file@{vbucket\_\-config\_\-parse\_\-file}}
+\index{vbucket\_\-config\_\-parse\_\-file@{vbucket\_\-config\_\-parse\_\-file}!CD@{CD}}
+\subsubsection[{vbucket\_\-config\_\-parse\_\-file}]{\setlength{\rightskip}{0pt plus 5cm}VBUCKET\_\-CONFIG\_\-HANDLE vbucket\_\-config\_\-parse\_\-file (const char $\ast$ {\em filename})}}
+\label{group___c_d_gab07e7f5741db4e787cee43f1c42fd061}
+
+
+Create an instance of vbucket config from a file. 
+
+
+\begin{DoxyParams}{Parameters}
+\item[{\em filename}]the vbucket config to parse \end{DoxyParams}
+\hypertarget{group___c_d_ga9dbcb358df598b59cb4922b951cb817a}{
+\index{CD@{CD}!vbucket\_\-config\_\-parse\_\-string@{vbucket\_\-config\_\-parse\_\-string}}
+\index{vbucket\_\-config\_\-parse\_\-string@{vbucket\_\-config\_\-parse\_\-string}!CD@{CD}}
+\subsubsection[{vbucket\_\-config\_\-parse\_\-string}]{\setlength{\rightskip}{0pt plus 5cm}VBUCKET\_\-CONFIG\_\-HANDLE vbucket\_\-config\_\-parse\_\-string (const char $\ast$ {\em data})}}
+\label{group___c_d_ga9dbcb358df598b59cb4922b951cb817a}
+
+
+Create an instance of vbucket config from a string. 
+
+
+\begin{DoxyParams}{Parameters}
+\item[{\em data}]a vbucket config string. \end{DoxyParams}

@@ -1,0 +1,46 @@
+\hypertarget{group__cfgcmp}{
+\section{Config Comparison}
+\label{group__cfgcmp}\index{Config Comparison@{Config Comparison}}
+}
+\subsection*{Data Structures}
+\begin{DoxyCompactItemize}
+\item 
+struct \hyperlink{struct_v_b_u_c_k_e_t___c_o_n_f_i_g___d_i_f_f}{VBUCKET\_\-CONFIG\_\-DIFF}
+\begin{DoxyCompactList}\small\item\em Difference between two vbucket configs. \item\end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{struct_v_b_u_c_k_e_t___c_o_n_f_i_g___d_i_f_f}{VBUCKET\_\-CONFIG\_\-DIFF} $\ast$ \hyperlink{group__cfgcmp_ga2724b8e3fccceb7e74f307b429b4c0f1}{vbucket\_\-compare} (VBUCKET\_\-CONFIG\_\-HANDLE from, VBUCKET\_\-CONFIG\_\-HANDLE to)
+\begin{DoxyCompactList}\small\item\em Compare two vbucket handles. \item\end{DoxyCompactList}\item 
+void \hyperlink{group__cfgcmp_gaec47fa8f2f15b56adc86cfd63b64b4ed}{vbucket\_\-free\_\-diff} (\hyperlink{struct_v_b_u_c_k_e_t___c_o_n_f_i_g___d_i_f_f}{VBUCKET\_\-CONFIG\_\-DIFF} $\ast$diff)
+\begin{DoxyCompactList}\small\item\em Free a vbucket diff. \item\end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Function Documentation}
+\hypertarget{group__cfgcmp_ga2724b8e3fccceb7e74f307b429b4c0f1}{
+\index{cfgcmp@{cfgcmp}!vbucket\_\-compare@{vbucket\_\-compare}}
+\index{vbucket\_\-compare@{vbucket\_\-compare}!cfgcmp@{cfgcmp}}
+\subsubsection[{vbucket\_\-compare}]{\setlength{\rightskip}{0pt plus 5cm}{\bf VBUCKET\_\-CONFIG\_\-DIFF}$\ast$ vbucket\_\-compare (VBUCKET\_\-CONFIG\_\-HANDLE {\em from}, \/  VBUCKET\_\-CONFIG\_\-HANDLE {\em to})}}
+\label{group__cfgcmp_ga2724b8e3fccceb7e74f307b429b4c0f1}
+
+
+Compare two vbucket handles. 
+
+
+\begin{DoxyParams}{Parameters}
+\item[{\em from}]the source vbucket config \item[{\em to}]the destination vbucket config\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+what changed between the \char`\"{}from\char`\"{} config and the \char`\"{}to\char`\"{} config 
+\end{DoxyReturn}
+\hypertarget{group__cfgcmp_gaec47fa8f2f15b56adc86cfd63b64b4ed}{
+\index{cfgcmp@{cfgcmp}!vbucket\_\-free\_\-diff@{vbucket\_\-free\_\-diff}}
+\index{vbucket\_\-free\_\-diff@{vbucket\_\-free\_\-diff}!cfgcmp@{cfgcmp}}
+\subsubsection[{vbucket\_\-free\_\-diff}]{\setlength{\rightskip}{0pt plus 5cm}void vbucket\_\-free\_\-diff ({\bf VBUCKET\_\-CONFIG\_\-DIFF} $\ast$ {\em diff})}}
+\label{group__cfgcmp_gaec47fa8f2f15b56adc86cfd63b64b4ed}
+
+
+Free a vbucket diff. 
+
+
+\begin{DoxyParams}{Parameters}
+\item[{\em diff}]the diff to free \end{DoxyParams}

@@ -1,0 +1,57 @@
+\hypertarget{group__cfg}{
+\section{Config Access}
+\label{group__cfg}\index{Config Access@{Config Access}}
+}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \hyperlink{group__cfg_ga98b511861a9091e834ff16ab80578e87}{vbucket\_\-config\_\-get\_\-num\_\-replicas} (VBUCKET\_\-CONFIG\_\-HANDLE h)
+\begin{DoxyCompactList}\small\item\em Get the number of replicas configured for each vbucket. \item\end{DoxyCompactList}\item 
+int \hyperlink{group__cfg_ga83b3ce8468743627eec4a27677b04148}{vbucket\_\-config\_\-get\_\-num\_\-vbuckets} (VBUCKET\_\-CONFIG\_\-HANDLE h)
+\begin{DoxyCompactList}\small\item\em Get the total number of vbuckets;. \item\end{DoxyCompactList}\item 
+int \hyperlink{group__cfg_ga3ee2eda1aab2a6c36794cc5ea9a89984}{vbucket\_\-config\_\-get\_\-num\_\-servers} (VBUCKET\_\-CONFIG\_\-HANDLE h)
+\begin{DoxyCompactList}\small\item\em Get the total number of known servers. \item\end{DoxyCompactList}\item 
+const char $\ast$ \hyperlink{group__cfg_gac403d4b4b1dce07946c8b4c48e824199}{vbucket\_\-config\_\-get\_\-server} (VBUCKET\_\-CONFIG\_\-HANDLE h, int i)
+\begin{DoxyCompactList}\small\item\em Get the server at the given index. \item\end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Function Documentation}
+\hypertarget{group__cfg_ga98b511861a9091e834ff16ab80578e87}{
+\index{cfg@{cfg}!vbucket\_\-config\_\-get\_\-num\_\-replicas@{vbucket\_\-config\_\-get\_\-num\_\-replicas}}
+\index{vbucket\_\-config\_\-get\_\-num\_\-replicas@{vbucket\_\-config\_\-get\_\-num\_\-replicas}!cfg@{cfg}}
+\subsubsection[{vbucket\_\-config\_\-get\_\-num\_\-replicas}]{\setlength{\rightskip}{0pt plus 5cm}int vbucket\_\-config\_\-get\_\-num\_\-replicas (VBUCKET\_\-CONFIG\_\-HANDLE {\em h})}}
+\label{group__cfg_ga98b511861a9091e834ff16ab80578e87}
+
+
+Get the number of replicas configured for each vbucket. 
+
+\hypertarget{group__cfg_ga3ee2eda1aab2a6c36794cc5ea9a89984}{
+\index{cfg@{cfg}!vbucket\_\-config\_\-get\_\-num\_\-servers@{vbucket\_\-config\_\-get\_\-num\_\-servers}}
+\index{vbucket\_\-config\_\-get\_\-num\_\-servers@{vbucket\_\-config\_\-get\_\-num\_\-servers}!cfg@{cfg}}
+\subsubsection[{vbucket\_\-config\_\-get\_\-num\_\-servers}]{\setlength{\rightskip}{0pt plus 5cm}int vbucket\_\-config\_\-get\_\-num\_\-servers (VBUCKET\_\-CONFIG\_\-HANDLE {\em h})}}
+\label{group__cfg_ga3ee2eda1aab2a6c36794cc5ea9a89984}
+
+
+Get the total number of known servers. 
+
+\hypertarget{group__cfg_ga83b3ce8468743627eec4a27677b04148}{
+\index{cfg@{cfg}!vbucket\_\-config\_\-get\_\-num\_\-vbuckets@{vbucket\_\-config\_\-get\_\-num\_\-vbuckets}}
+\index{vbucket\_\-config\_\-get\_\-num\_\-vbuckets@{vbucket\_\-config\_\-get\_\-num\_\-vbuckets}!cfg@{cfg}}
+\subsubsection[{vbucket\_\-config\_\-get\_\-num\_\-vbuckets}]{\setlength{\rightskip}{0pt plus 5cm}int vbucket\_\-config\_\-get\_\-num\_\-vbuckets (VBUCKET\_\-CONFIG\_\-HANDLE {\em h})}}
+\label{group__cfg_ga83b3ce8468743627eec4a27677b04148}
+
+
+Get the total number of vbuckets;. 
+
+\hypertarget{group__cfg_gac403d4b4b1dce07946c8b4c48e824199}{
+\index{cfg@{cfg}!vbucket\_\-config\_\-get\_\-server@{vbucket\_\-config\_\-get\_\-server}}
+\index{vbucket\_\-config\_\-get\_\-server@{vbucket\_\-config\_\-get\_\-server}!cfg@{cfg}}
+\subsubsection[{vbucket\_\-config\_\-get\_\-server}]{\setlength{\rightskip}{0pt plus 5cm}const char$\ast$ vbucket\_\-config\_\-get\_\-server (VBUCKET\_\-CONFIG\_\-HANDLE {\em h}, \/  int {\em i})}}
+\label{group__cfg_gac403d4b4b1dce07946c8b4c48e824199}
+
+
+Get the server at the given index. 
+
+\begin{DoxyReturn}{Returns}
+a string in the form of hostname:port 
+\end{DoxyReturn}

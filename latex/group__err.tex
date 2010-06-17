@@ -1,0 +1,41 @@
+\hypertarget{group__err}{
+\section{Error handling}
+\label{group__err}\index{Error handling@{Error handling}}
+}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+const char $\ast$ \hyperlink{group__err_ga3048aad4cad83312f3ddb23b238cde1a}{vbucket\_\-get\_\-error} (void)
+\begin{DoxyCompactList}\small\item\em Get the most recent vbucket error. \item\end{DoxyCompactList}\item 
+int \hyperlink{group__err_ga53d9ce1b5ea14045b19bea06c046c1c1}{vbucket\_\-found\_\-incorrect\_\-master} (VBUCKET\_\-CONFIG\_\-HANDLE h, int vbucket, int wrongserver)
+\begin{DoxyCompactList}\small\item\em Tell libvbucket it told you the wrong server ID. \item\end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Function Documentation}
+\hypertarget{group__err_ga53d9ce1b5ea14045b19bea06c046c1c1}{
+\index{err@{err}!vbucket\_\-found\_\-incorrect\_\-master@{vbucket\_\-found\_\-incorrect\_\-master}}
+\index{vbucket\_\-found\_\-incorrect\_\-master@{vbucket\_\-found\_\-incorrect\_\-master}!err@{err}}
+\subsubsection[{vbucket\_\-found\_\-incorrect\_\-master}]{\setlength{\rightskip}{0pt plus 5cm}int vbucket\_\-found\_\-incorrect\_\-master (VBUCKET\_\-CONFIG\_\-HANDLE {\em h}, \/  int {\em vbucket}, \/  int {\em wrongserver})}}
+\label{group__err_ga53d9ce1b5ea14045b19bea06c046c1c1}
+
+
+Tell libvbucket it told you the wrong server ID. 
+
+This will cause libvbucket to do whatever is necessary to try to figure out a better answer.
+
+
+\begin{DoxyParams}{Parameters}
+\item[{\em h}]the vbucket config handle. \item[{\em vbucket}]the vbucket ID \item[{\em wrongserver}]the incorrect server ID\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the correct server ID 
+\end{DoxyReturn}
+\hypertarget{group__err_ga3048aad4cad83312f3ddb23b238cde1a}{
+\index{err@{err}!vbucket\_\-get\_\-error@{vbucket\_\-get\_\-error}}
+\index{vbucket\_\-get\_\-error@{vbucket\_\-get\_\-error}!err@{err}}
+\subsubsection[{vbucket\_\-get\_\-error}]{\setlength{\rightskip}{0pt plus 5cm}const char$\ast$ vbucket\_\-get\_\-error (void)}}
+\label{group__err_ga3048aad4cad83312f3ddb23b238cde1a}
+
+
+Get the most recent vbucket error. 
+
+This is currently not threadsafe. 

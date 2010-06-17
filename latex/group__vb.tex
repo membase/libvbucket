@@ -1,0 +1,61 @@
+\hypertarget{group__vb}{
+\section{VBucket Access}
+\label{group__vb}\index{VBucket Access@{VBucket Access}}
+}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \hyperlink{group__vb_ga986d488595a80170c3d768373e8a3acc}{vbucket\_\-get\_\-vbucket\_\-by\_\-key} (VBUCKET\_\-CONFIG\_\-HANDLE h, const void $\ast$key, size\_\-t nkey)
+\begin{DoxyCompactList}\small\item\em Get the vbucket number for the given key. \item\end{DoxyCompactList}\item 
+int \hyperlink{group__vb_ga20536a65acb417838ae8ea7aafee80d1}{vbucket\_\-get\_\-master} (VBUCKET\_\-CONFIG\_\-HANDLE h, int id)
+\begin{DoxyCompactList}\small\item\em Get the master server for the given vbucket. \item\end{DoxyCompactList}\item 
+int \hyperlink{group__vb_ga81e3c7d204c5b0506aaa8297eca90a63}{vbucket\_\-get\_\-replica} (VBUCKET\_\-CONFIG\_\-HANDLE h, int id, int n)
+\begin{DoxyCompactList}\small\item\em Get a given replica for a vbucket. \item\end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Function Documentation}
+\hypertarget{group__vb_ga20536a65acb417838ae8ea7aafee80d1}{
+\index{vb@{vb}!vbucket\_\-get\_\-master@{vbucket\_\-get\_\-master}}
+\index{vbucket\_\-get\_\-master@{vbucket\_\-get\_\-master}!vb@{vb}}
+\subsubsection[{vbucket\_\-get\_\-master}]{\setlength{\rightskip}{0pt plus 5cm}int vbucket\_\-get\_\-master (VBUCKET\_\-CONFIG\_\-HANDLE {\em h}, \/  int {\em id})}}
+\label{group__vb_ga20536a65acb417838ae8ea7aafee80d1}
+
+
+Get the master server for the given vbucket. 
+
+
+\begin{DoxyParams}{Parameters}
+\item[{\em h}]the vbucket config \item[{\em id}]the vbucket identifier\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the server index 
+\end{DoxyReturn}
+\hypertarget{group__vb_ga81e3c7d204c5b0506aaa8297eca90a63}{
+\index{vb@{vb}!vbucket\_\-get\_\-replica@{vbucket\_\-get\_\-replica}}
+\index{vbucket\_\-get\_\-replica@{vbucket\_\-get\_\-replica}!vb@{vb}}
+\subsubsection[{vbucket\_\-get\_\-replica}]{\setlength{\rightskip}{0pt plus 5cm}int vbucket\_\-get\_\-replica (VBUCKET\_\-CONFIG\_\-HANDLE {\em h}, \/  int {\em id}, \/  int {\em n})}}
+\label{group__vb_ga81e3c7d204c5b0506aaa8297eca90a63}
+
+
+Get a given replica for a vbucket. 
+
+
+\begin{DoxyParams}{Parameters}
+\item[{\em h}]the vbucket config \item[{\em id}]the vbucket id \item[{\em n}]the replica number\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the server ID 
+\end{DoxyReturn}
+\hypertarget{group__vb_ga986d488595a80170c3d768373e8a3acc}{
+\index{vb@{vb}!vbucket\_\-get\_\-vbucket\_\-by\_\-key@{vbucket\_\-get\_\-vbucket\_\-by\_\-key}}
+\index{vbucket\_\-get\_\-vbucket\_\-by\_\-key@{vbucket\_\-get\_\-vbucket\_\-by\_\-key}!vb@{vb}}
+\subsubsection[{vbucket\_\-get\_\-vbucket\_\-by\_\-key}]{\setlength{\rightskip}{0pt plus 5cm}int vbucket\_\-get\_\-vbucket\_\-by\_\-key (VBUCKET\_\-CONFIG\_\-HANDLE {\em h}, \/  const void $\ast$ {\em key}, \/  size\_\-t {\em nkey})}}
+\label{group__vb_ga986d488595a80170c3d768373e8a3acc}
+
+
+Get the vbucket number for the given key. 
+
+
+\begin{DoxyParams}{Parameters}
+\item[{\em h}]the vbucket config \item[{\em key}]pointer to the beginning of the key \item[{\em nkey}]the size of the key\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+a key 
+\end{DoxyReturn}
