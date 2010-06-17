@@ -56,6 +56,20 @@ int vbucket_get_master(VBUCKET_CONFIG_HANDLE h, int id);
 LIBVBUCKET_PUBLIC_API
 int vbucket_get_replica(VBUCKET_CONFIG_HANDLE h, int id, int n);
 
+/**
+ * Tell libvbucket it told you the wrong server ID.
+ *
+ * @param h the vbucket config handle.
+ * @param vbucket the vbucket ID
+ * @param wrongserver the incorrect server ID
+ *
+ * @return the correct server ID
+ */
+LIBVBUCKET_PUBLIC_API
+int vbucket_found_incorrect_master(VBUCKET_CONFIG_HANDLE h,
+                                   int vbucket,
+                                   int wrongserver);
+
 #ifdef __cplusplus
 }
 #endif

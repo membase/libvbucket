@@ -296,3 +296,16 @@ int vbucket_get_replica(VBUCKET_CONFIG_HANDLE h, int vbucket, int i) {
     return vb->vbuckets[vbucket].servers[i+1];
 }
 
+int vbucket_found_incorrect_master(VBUCKET_CONFIG_HANDLE h, int vbucket,
+                                   int wrongserver) {
+    struct vbucket_config_st *vb = (struct vbucket_config_st*)h;
+
+    int mappedServer = vb->vbuckets[vbucket].servers[0];
+    int rv = mappedServer;
+    if (mappedServer == wrongserver) {
+        rv = (rv + 1) % vb->num_servers;
+        vb->vbuckets[vbucket].servers[0] = rv;
+    }
+
+    return rv;
+}

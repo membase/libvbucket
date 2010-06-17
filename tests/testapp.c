@@ -145,11 +145,37 @@ static void testConfig(const char *c) {
     vbucket_config_destroy(vb);
 }
 
+static void testWrongServer(const char *c) {
+    VBUCKET_CONFIG_HANDLE vb = vbucket_config_parse_string(c);
+    if (vb == NULL) {
+        fprintf(stderr, "vbucket_config_parse_string error: %s\n", vbucket_get_error());
+        abort();
+    }
+
+    // Starts at 0
+    assert(vbucket_get_master(vb, 0) == 0);
+    // Does not change when I told it I found the wrong thing
+    assert(vbucket_found_incorrect_master(vb, 0, 1) == 0);
+    assert(vbucket_get_master(vb, 0) == 0);
+    // Does change if I tell it I got the right thing and it was wrong.
+    assert(vbucket_found_incorrect_master(vb, 0, 0) == 1);
+    assert(vbucket_get_master(vb, 0) == 1);
+    // ...and again
+    assert(vbucket_found_incorrect_master(vb, 0, 1) == 2);
+    assert(vbucket_get_master(vb, 0) == 2);
+    // ...and then wraps
+    assert(vbucket_found_incorrect_master(vb, 0, 2) == 0);
+    assert(vbucket_get_master(vb, 0) == 0);
+
+    vbucket_config_destroy(vb);
+}
+
 int main(void) {
   testConfig(config);
   testConfig(configFlat);
   testConfig(configInEnvelope);
   testConfig(configInEnvelope2);
+  testWrongServer(config);
 }
 
 
