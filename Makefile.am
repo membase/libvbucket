@@ -12,19 +12,22 @@ pkginclude_HEADERS = \
                      include/libvbucket/vbucket.h \
                      include/libvbucket/visibility.h
 
-man_MANS = libvbucket.3lib \
-           libvbucket.4 \
-           vbucket_config_destroy.3vbucket \
-           vbucket_config_get_num_replicas.3vbucket \
-           vbucket_config_get_num_servers.3vbucket \
-           vbucket_config_get_num_vbuckets.3vbucket \
-           vbucket_config_get_server.3vbucket \
-           vbucket_config_parse_file.3vbucket \
-           vbucket_config_parse_string.3vbucket \
-           vbucket_get_error.3vbucket \
-           vbucket_get_master.3vbucket \
-           vbucket_get_replica.3vbucket \
-           vbucket_get_vbucket_by_key.3vbucket
+man_MANS =
+if BUILD_DOCS
+man_MANS += libvbucket.3lib \
+            libvbucket.4 \
+            vbucket_config_destroy.3vbucket \
+            vbucket_config_get_num_replicas.3vbucket \
+            vbucket_config_get_num_servers.3vbucket \
+            vbucket_config_get_num_vbuckets.3vbucket \
+            vbucket_config_get_server.3vbucket \
+            vbucket_config_parse_file.3vbucket \
+            vbucket_config_parse_string.3vbucket \
+            vbucket_get_error.3vbucket \
+            vbucket_get_master.3vbucket \
+            vbucket_get_replica.3vbucket \
+            vbucket_get_vbucket_by_key.3vbucket
+endif
 
 CLEANFILES= ${man_MANS}
 

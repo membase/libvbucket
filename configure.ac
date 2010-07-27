@@ -15,7 +15,6 @@ AC_DISABLE_STATIC
 
 PANDORA_CANONICAL_TARGET(less-warnings, warnings-always-on, force-gcc42)
 PANDORA_REQUIRE_LIBHASHKIT
-REQUIRE_POD2MAN
 
 AH_TOP([
 #ifndef CONFIG_H
@@ -49,6 +48,18 @@ AH_BOTTOM([
 #endif
 ])
 
+AC_ARG_WITH([docs],
+  [AS_HELP_STRING([--with-docs],
+    [Generate documentation (yes|no) @<:@default=yes@:>@])],
+  [with_docs=$withval],
+  [with_docs=yes])
+
+AS_IF([test "$with_docs" = "yes"],
+  [
+    REQUIRE_POD2MAN
+  ])
+AM_CONDITIONAL(BUILD_DOCS, test "$with_docs" = "yes")
+
 dnl ----------------------------------------------------------------------------
 
 AC_CONFIG_FILES(Makefile libvbucket.pc)
@@ -66,3 +77,14 @@ echo "   * Debug enabled:             $with_debug"
 echo "   * Warnings as failure:       $ac_cv_warnings_as_errors"
 echo ""
 echo "---"
+
+AS_IF(test "$with_docs" = "no",
+  [
+    echo "*****"
+    echo "*"
+    echo "*  WARNING: You are not generating any documentation."
+    echo "*           Please don't ship libmvbucket to an end user"
+    echo "*           without documentation..."
+    echo "*"
+    echo "*****"
+  ])
