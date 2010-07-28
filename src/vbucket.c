@@ -45,6 +45,8 @@ struct vbucket_config_st {
     int mask;
     int num_servers;
     int num_replicas;
+    char *user;
+    char *password;
     char **servers;
     struct vbucket_st vbuckets[];
 };
@@ -78,7 +80,9 @@ static hashkit_hash_algorithm_t lookup_hash_algorithm(const char *s) {
 static struct vbucket_config_st *config_create(char *hash_algorithm,
                                                int num_servers,
                                                int num_vbuckets,
-                                               int num_replicas) {
+                                               int num_replicas,
+                                               char *user,
+                                               char *password) {
     hashkit_hash_algorithm_t ha = lookup_hash_algorithm(hash_algorithm);
     if (ha == HASHKIT_HASH_MAX) {
         errstr = "Bogus hash algorithm specified";
@@ -104,6 +108,14 @@ static struct vbucket_config_st *config_create(char *hash_algorithm,
     vb->num_vbuckets = num_vbuckets;
     vb->num_replicas = num_replicas;
     vb->mask = num_vbuckets - 1;
+
+    if (user != NULL) {
+        vb->user = strdup(user);
+    }
+    if (password != NULL) {
+        vb->password = strdup(password);
+    }
+
     return vb;
 }
 
@@ -112,6 +124,12 @@ void vbucket_config_destroy(VBUCKET_CONFIG_HANDLE vb) {
         free(vb->servers[i]);
     }
     free(vb->servers);
+    if (vb->user != NULL) {
+        free(vb->user);
+    }
+    if (vb->password != NULL) {
+        free(vb->password);
+    }
     free(vb);
 }
 
@@ -198,8 +216,21 @@ static VBUCKET_CONFIG_HANDLE parse_cjson(cJSON *c) {
         return NULL;
     }
 
+    char *user = NULL;
+    cJSON *jUser = cJSON_GetObjectItem(c, "user");
+    if (jUser != NULL && jUser->type == cJSON_String) {
+        user = jUser->valuestring;
+    }
+
+    char *password = NULL;
+    cJSON *jPassword = cJSON_GetObjectItem(c, "password");
+    if (jPassword != NULL && jPassword->type == cJSON_String) {
+        password = jPassword->valuestring;
+    }
+
     struct vbucket_config_st *vb = config_create(hashAlgorithm, numServers,
-                                                 numBuckets, numReplicas);
+                                                 numBuckets, numReplicas,
+                                                 user, password);
     if (vb == NULL) {
         return NULL;
     }
@@ -276,6 +307,14 @@ const char *vbucket_config_get_server(VBUCKET_CONFIG_HANDLE vb, int i) {
     return vb->servers[i];
 }
 
+const char *vbucket_config_get_user(VBUCKET_CONFIG_HANDLE vb) {
+    return vb->user;
+}
+
+const char *vbucket_config_get_password(VBUCKET_CONFIG_HANDLE vb) {
+    return vb->password;
+}
+
 int vbucket_get_vbucket_by_key(VBUCKET_CONFIG_HANDLE vb, const void *key, size_t nkey) {
     uint32_t digest = libhashkit_digest(key, nkey, vb->hk_algorithm);
     return digest & vb->mask;
@@ -346,6 +385,19 @@ VBUCKET_CONFIG_DIFF* vbucket_compare(VBUCKET_CONFIG_HANDLE from,
     } else {
         /* Just say yes */
         rv->sequence_changed = true;
+    }
+
+    /* Consider the sequence changed if the auth credentials changed */
+    if (from->user != NULL && to->user != NULL) {
+        rv->sequence_changed |= (strcmp(from->user, to->user) != 0);
+    } else {
+        rv->sequence_changed |= ((from->user != NULL) ^ (to->user != NULL));
+    }
+
+    if (from->password != NULL && to->password != NULL) {
+        rv->sequence_changed |= (strcmp(from->password, to->password) != 0);
+    } else {
+        rv->sequence_changed |= ((from->password != NULL) ^ (to->password != NULL));
     }
 
     /* Count the number of vbucket differences */

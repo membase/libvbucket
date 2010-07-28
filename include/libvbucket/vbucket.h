@@ -177,6 +177,22 @@ extern "C" {
     int vbucket_config_get_num_servers(VBUCKET_CONFIG_HANDLE h);
 
     /**
+     * Get the optional SASL user.
+     *
+     * @return a string or NULL.
+     */
+    LIBVBUCKET_PUBLIC_API
+    const char *vbucket_config_get_user(VBUCKET_CONFIG_HANDLE h);
+
+    /**
+     * Get the optional SASL password.
+     *
+     * @return a string or NULL.
+     */
+    LIBVBUCKET_PUBLIC_API
+    const char *vbucket_config_get_password(VBUCKET_CONFIG_HANDLE h);
+
+    /**
      * Get the server at the given index.
      *
      * @return a string in the form of hostname:port

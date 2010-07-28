@@ -142,6 +142,9 @@ static void testConfig(const char *c) {
         assert(vbucket_get_replica(vb, i, 1) == vbuckets[i].replicas[1]);
     }
 
+    assert(vbucket_config_get_user(vb) == NULL);
+    assert(vbucket_config_get_password(vb) == NULL);
+
     vbucket_config_destroy(vb);
 }
 
@@ -242,7 +245,91 @@ static void testConfigDiff(void) {
     assert(diff->servers_added[0] == NULL);
     assert(strcmp(diff->servers_removed[0], "server3:11211") == 0);
     assert(diff->servers_removed[1] == NULL);
+}
 
+static void testConfigDiffSame(void) {
+    VBUCKET_CONFIG_HANDLE vb1 = vbucket_config_parse_string(config);
+    assert(vb1);
+
+    VBUCKET_CONFIG_HANDLE vb2 = vbucket_config_parse_string(config);
+    assert(vb2);
+
+    VBUCKET_CONFIG_DIFF *diff = vbucket_compare(vb1, vb2);
+    assert(diff);
+
+    assert(diff->sequence_changed == 0);
+    assert(diff->n_vb_changes == 0);
+    assert(diff->servers_added[0] == NULL);
+    assert(diff->servers_removed[0] == NULL);
+
+    vbucket_free_diff(diff);
+    vbucket_config_destroy(vb1);
+    vbucket_config_destroy(vb2);
+}
+
+static void testConfigUserPassword(void) {
+    const char *cfg1 = "{\n"
+        "  \"hashAlgorithm\": \"CRC\",\n"
+        "  \"numReplicas\": 2,\n"
+        "  \"serverList\": [\"server1:11211\", \"server2:11210\", \"server3:11211\"],\n"
+        "  \"user\": \"theUser\",\n"
+        "  \"password\": \"thePassword\",\n"
+        "  \"vBucketMap\":\n"
+        "    [\n"
+        "      [0, 1, 2],\n"
+        "      [1, 2, 0],\n"
+        "      [2, 1, -1],\n"
+        "      [1, 2, 0]\n"
+        "    ]\n"
+        "}";
+
+    const char *cfg2 = "{\n"
+        "  \"hashAlgorithm\": \"CRC\",\n"
+        "  \"numReplicas\": 2,\n"
+        "  \"serverList\": [\"server1:11211\", \"server2:11210\", \"server3:11211\"],\n"
+        "  \"user\": \"theUserIsDifferent\",\n"
+        "  \"password\": \"thePasswordIsDifferent\",\n"
+        "  \"vBucketMap\":\n"
+        "    [\n"
+        "      [0, 1, 2],\n"
+        "      [1, 2, 0],\n"
+        "      [2, 1, -1],\n"
+        "      [1, 2, 0]\n"
+        "    ]\n"
+        "}";
+
+    VBUCKET_CONFIG_HANDLE vb1 = vbucket_config_parse_string(cfg1);
+    assert(vb1);
+    assert(strcmp(vbucket_config_get_user(vb1), "theUser") == 0);
+    assert(strcmp(vbucket_config_get_password(vb1), "thePassword") == 0);
+
+    VBUCKET_CONFIG_HANDLE vb2 = vbucket_config_parse_string(cfg2);
+    assert(vb2);
+    assert(strcmp(vbucket_config_get_user(vb2), "theUserIsDifferent") == 0);
+    assert(strcmp(vbucket_config_get_password(vb2), "thePasswordIsDifferent") == 0);
+
+    VBUCKET_CONFIG_DIFF *diff = vbucket_compare(vb1, vb2);
+    assert(diff);
+
+    assert(diff->sequence_changed);
+    assert(diff->n_vb_changes == 0);
+    assert(diff->servers_added[0] == NULL);
+    assert(diff->servers_removed[0] == NULL);
+
+    vbucket_free_diff(diff);
+
+    diff = vbucket_compare(vb1, vb1);
+    assert(diff);
+
+    assert(diff->sequence_changed == 0);
+    assert(diff->n_vb_changes == 0);
+    assert(diff->servers_added[0] == NULL);
+    assert(diff->servers_removed[0] == NULL);
+
+    vbucket_free_diff(diff);
+
+    vbucket_config_destroy(vb1);
+    vbucket_config_destroy(vb2);
 }
 
 int main(void) {
@@ -252,6 +339,8 @@ int main(void) {
   testConfig(configInEnvelope2);
   testWrongServer(config);
   testConfigDiff();
+  testConfigDiffSame();
+  testConfigUserPassword();
 }
 
 
