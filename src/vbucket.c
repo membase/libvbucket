@@ -339,7 +339,7 @@ VBUCKET_CONFIG_DIFF* vbucket_compare(VBUCKET_CONFIG_HANDLE from,
     if (to->num_servers == from->num_servers) {
         rv->sequence_changed = false;
         for (int i = 0; i < from->num_servers; i++) {
-            rv->sequence_changed |= (0 == strcmp(vbucket_config_get_server(from, i),
+            rv->sequence_changed |= (0 != strcmp(vbucket_config_get_server(from, i),
                                                  vbucket_config_get_server(to, i)));
 
         }
