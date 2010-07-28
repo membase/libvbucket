@@ -255,6 +255,7 @@ extern "C" {
      *
      * @param diff the diff to free
      */
+    LIBVBUCKET_PUBLIC_API
     void vbucket_free_diff(VBUCKET_CONFIG_DIFF *diff);
 
     /**
