@@ -51,7 +51,7 @@ AH_BOTTOM([
 
 dnl ----------------------------------------------------------------------------
 
-AC_CONFIG_FILES(Makefile)
+AC_CONFIG_FILES(Makefile libvbucket.pc)
 AC_OUTPUT
 echo "---"
 echo "Configuration summary for $PACKAGE_NAME version $VERSION"

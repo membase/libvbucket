@@ -70,6 +70,9 @@ vbucket_get_replica.3vbucket: docs/vbucket.pod
 
 lib_LTLIBRARIES = libvbucket.la
 
+pkgconfigdir = $(libdir)/pkgconfig
+pkgconfig_DATA = libvbucket.pc
+
 check_PROGRAMS= testapp
 TESTS = ${check_PROGRAMS}
 
