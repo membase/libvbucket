@@ -25,17 +25,17 @@ int main(int argc, char **argv) {
         printf("vbuckettool mapfile key0 [key1 ... [keyN]]\n\n");
         printf("  The vbuckettool expects a vBucketServerMap JSON mapfile, and\n");
         printf("  will print the vBucketId and servers each key should live on.\n");
-        printf("  You may use '--' instead for the filename to specify stdin.\n\n");
+        printf("  You may use '-' instead for the filename to specify stdin.\n\n");
         printf("  Examples:\n");
         printf("    ./vbuckettool file.json some_key another_key\n\n");
         printf("    curl http://HOST:8080/pools/default/buckets/default | \\\n");
-        printf("       ./vbuckettool -- some_key another_key\n");
+        printf("       ./vbuckettool - some_key another_key\n");
         exit(1);
     }
 
     VBUCKET_CONFIG_HANDLE vb = NULL;
 
-    if (strcmp("--", argv[1]) == 0) {
+    if (strcmp("-", argv[1]) == 0) {
         char buf[50000];
         if (fgets(buf, sizeof(buf) - 1, stdin) == NULL) {
             fprintf(stderr, "ERROR: vbuckettool found no input on stdin\n");
