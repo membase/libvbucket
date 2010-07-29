@@ -33,6 +33,9 @@
 /m4/ltversion.m4
 /m4/version.m4
 /stamp-h1
+a.out*
 Makefile
 Makefile.in
+libvbucket.pc
 testapp
+vbuckettool

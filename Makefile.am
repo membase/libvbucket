@@ -6,7 +6,8 @@
 # the COPYING file in this directory for full text.
 ACLOCAL_AMFLAGS = -I m4 --force
 
-bin_PROGRAMS =
+bin_PROGRAMS = vbuckettool
+
 pkginclude_HEADERS = \
                      include/libvbucket/vbucket.h \
                      include/libvbucket/visibility.h
@@ -88,6 +89,9 @@ libvbucket_la_SOURCES= \
 libvbucket_la_LDFLAGS=
 libvbucket_la_LIBADD= ${LTLIBHASHKIT}
 
+vbuckettool_SOURCES = src/vbuckettool.c
+vbuckettool_DEPENDENCIES= libvbucket.la
+vbuckettool_LDADD= libvbucket.la ${LTLIBHASHKIT}
 
 test: check-TESTS
 
