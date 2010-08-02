@@ -59,3 +59,4 @@ particular master/replica of that particular vBucket.
 
 In the future this will probably be extended to support "intermediate
 states" of vBuckets which are being migrated.
+
