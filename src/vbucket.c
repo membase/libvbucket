@@ -48,6 +48,7 @@ struct vbucket_config_st {
     char *user;
     char *password;
     char **servers;
+    struct vbucket_st *fvbuckets;
     struct vbucket_st vbuckets[];
 };
 
@@ -130,6 +131,9 @@ void vbucket_config_destroy(VBUCKET_CONFIG_HANDLE vb) {
     if (vb->password != NULL) {
         free(vb->password);
     }
+    if (vb->fvbuckets != NULL) {
+        free(vb->fvbuckets);
+    }
     free(vb);
 }
 
@@ -150,7 +154,19 @@ static int populate_servers(struct vbucket_config_st *vb, cJSON *c) {
     return 0;
 }
 
-static int populate_buckets(struct vbucket_config_st *vb, cJSON *c) {
+static int populate_buckets(struct vbucket_config_st *vb, cJSON *c, int is_ft) {
+
+    struct vbucket_st *vbucket_map = NULL;
+
+    if (is_ft) {
+        if (!(vb->fvbuckets = malloc(vb->num_vbuckets * sizeof(struct vbucket_st)))) {
+            errstr = "Failed to allocate storage for forward vbucket map";
+            return -1;
+        }
+    }
+
+    vbucket_map = (is_ft ? vb->fvbuckets : vb->vbuckets);
+
     for (int i = 0; i < vb->num_vbuckets; ++i) {
         cJSON *jBucket = cJSON_GetArrayItem(c, i);
         if (jBucket == NULL || jBucket->type != cJSON_Array ||
@@ -165,7 +181,7 @@ static int populate_buckets(struct vbucket_config_st *vb, cJSON *c) {
                 errstr = "Server ID must be >= -1 and < num_servers";
                 return -1;
             }
-            vb->vbuckets[i].servers[j] = jServerId->valueint;
+            vbucket_map[i].servers[j] = jServerId->valueint;
         }
     }
     return 0;
@@ -210,6 +226,14 @@ static VBUCKET_CONFIG_HANDLE parse_cjson(cJSON *c) {
         return NULL;
     }
 
+    /* this could possibly be null */
+    cJSON *jBucketsForward = cJSON_GetObjectItem(c, "vBucketMapForward");
+    if (jBuckets && jBuckets->type != cJSON_Array) {
+        errstr = "Expected array for vBucketMap";
+        return NULL;
+    }
+
+
     int numBuckets = cJSON_GetArraySize(jBuckets);
     if (numBuckets == 0 || (numBuckets & (numBuckets - 1)) != 0) {
         errstr = "Number of buckets must be a power of two > 0 and <= " STRINGIFY(MAX_BUCKETS);
@@ -240,10 +264,18 @@ static VBUCKET_CONFIG_HANDLE parse_cjson(cJSON *c) {
         return NULL;
     }
 
-    if (populate_buckets(vb, jBuckets) != 0) {
+    if (populate_buckets(vb, jBuckets, 0) != 0) {
         vbucket_config_destroy(vb);
         return NULL;
     }
+
+    if (jBucketsForward) {
+        if (populate_buckets(vb, jBucketsForward, 1) !=0) {
+            vbucket_config_destroy(vb);
+            return NULL;
+        }
+    }
+
     return vb;
 }
 
@@ -332,7 +364,18 @@ int vbucket_found_incorrect_master(VBUCKET_CONFIG_HANDLE vb, int vbucket,
                                    int wrongserver) {
     int mappedServer = vb->vbuckets[vbucket].servers[0];
     int rv = mappedServer;
-    if (mappedServer == wrongserver) {
+    /*
+     * if a forward table exists, then return the vbucket id from the forward table
+     * and update that information in the current table. We also need to Update the
+     * replica information for that vbucket
+     */
+    if (vb->fvbuckets) {
+        int i = 0;
+        rv = vb->vbuckets[vbucket].servers[0] = vb->fvbuckets[vbucket].servers[0];
+        for (i = 0; i < vb->num_replicas; i++) {
+            vb->vbuckets[vbucket].servers[i+1] = vb->fvbuckets[vbucket].servers[i+1];
+        }
+    } else if (mappedServer == wrongserver) {
         rv = (rv + 1) % vb->num_servers;
         vb->vbuckets[vbucket].servers[0] = rv;
     }

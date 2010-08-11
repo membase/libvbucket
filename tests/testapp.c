@@ -50,6 +50,31 @@ static const char *configInEnvelope =
     "}"
 "}";
 
+static const char *configInEnvelopeFFT =
+"{ \"otherKeyThatIsIgnored\": 12345,\n"
+  "\"vBucketServerMap\": \n"
+    "{\n"
+    "  \"hashAlgorithm\": \"CRC\",\n"
+    "  \"numReplicas\": 2,\n"
+    "  \"serverList\": [\"server1:11211\", \"server2:11210\", \"server3:11211\", \"server4:11211\"],\n"
+    "  \"vBucketMap\":\n"
+    "    [\n"
+    "      [0, 1, 2],\n"
+    "      [1, 2, 0],\n"
+    "      [2, 1, -1],\n"
+    "      [1, 2, 0]\n"
+    "    ],\n"
+    "  \"vBucketMapForward\":\n"
+    "    [\n"
+    "      [3, 0, 0],\n"
+    "      [2, 1, 3],\n"
+    "      [1, 2, 2],\n"
+    "      [0, 3, 1]\n"
+    "    ]\n"
+    "}"
+"}";
+
+
 static const char *configInEnvelope2 =
 "{\"name\":\"default\",\"uri\":\"/pools/default/buckets/default\","
  "\"streamingUri\":\"/pools/default/bucketsStreaming/default\","
@@ -129,7 +154,7 @@ static void testConfig(const char *c) {
         abort();
     }
 
-    assert(vbucket_config_get_num_servers(vb) == 3);
+    assert(vbucket_config_get_num_servers(vb) == 3 || vbucket_config_get_num_servers(vb) == 4);
     assert(vbucket_config_get_num_replicas(vb) == 2);
 
     for (i = 0; i < 3; ++i) {
@@ -147,6 +172,7 @@ static void testConfig(const char *c) {
 
     vbucket_config_destroy(vb);
 }
+
 
 static void testWrongServer(const char *c) {
     VBUCKET_CONFIG_HANDLE vb = vbucket_config_parse_string(c);
@@ -170,6 +196,30 @@ static void testWrongServer(const char *c) {
     assert(vbucket_found_incorrect_master(vb, 0, 2) == 0);
     assert(vbucket_get_master(vb, 0) == 0);
 
+    vbucket_config_destroy(vb);
+}
+
+static void testWrongServerFFT(const char *c) {
+
+    VBUCKET_CONFIG_HANDLE vb = vbucket_config_parse_string(c);
+    int rv = 0;
+    int nvb = 0;
+    int i = 0;
+
+    if (vb == NULL) {
+        fprintf(stderr, "vbucket_config_parse_string error: %s\n", vbucket_get_error());
+        abort();
+    }
+
+    // found incorrect master should not be the same as get master now
+    nvb = vbucket_config_get_num_vbuckets(vb);
+    for (i = 0; i < nvb; i++) {
+        rv = vbucket_get_master(vb, i);
+        assert(rv != vbucket_found_incorrect_master(vb, i, rv));
+    }
+    // the ideal test case should be that we check that the vbucket
+    // and the fvbucket map are identical at this point. TODO untill
+    // we have a vbucketlib function that diffs vbuckets and fvbuckets
     vbucket_config_destroy(vb);
 }
 
@@ -337,7 +387,9 @@ int main(void) {
   testConfig(configFlat);
   testConfig(configInEnvelope);
   testConfig(configInEnvelope2);
+  testConfig(configInEnvelopeFFT);
   testWrongServer(config);
+  testWrongServerFFT(configInEnvelopeFFT);
   testConfigDiff();
   testConfigDiffSame();
   testConfigUserPassword();
