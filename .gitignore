@@ -32,6 +32,7 @@
 /m4/ltsugar.m4
 /m4/ltversion.m4
 /m4/version.m4
+/regression
 /stamp-h1
 a.out*
 Makefile

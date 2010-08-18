@@ -77,13 +77,18 @@ lib_LTLIBRARIES = libvbucket.la
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = libvbucket.pc
 
-check_PROGRAMS= testapp
+check_PROGRAMS= testapp regression
 TESTS = ${check_PROGRAMS}
 
 # Test application to test stuff from C
 testapp_SOURCES = tests/testapp.c
 testapp_DEPENDENCIES= libvbucket.la
 testapp_LDADD= libvbucket.la ${LTLIBHASHKIT}
+
+regression_SOURCES = tests/regression.c
+regression_DEPENDENCIES= libvbucket.la
+regression_LDADD= libvbucket.la ${LTLIBHASHKIT}
+
 
 libvbucket_la_SOURCES= \
                         src/cJSON.c \
