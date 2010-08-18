@@ -4,11 +4,15 @@
 *.4
 *.[ao]
 *.dirstamp
+*.exe
 *.l[ao]
 *~
 .deps/
 .libs/
 /INSTALL
+/Makefile
+/Makefile.in
+/a.out*
 /aclocal.m4
 /autom4te.cache
 /config.h
@@ -27,6 +31,7 @@
 /configure
 /docs/doxy
 /libtool
+/libvbucket.pc
 /m4/libtool.m4
 /m4/ltoptions.m4
 /m4/ltsugar.m4
@@ -34,9 +39,5 @@
 /m4/version.m4
 /regression
 /stamp-h1
-a.out*
-Makefile
-Makefile.in
-libvbucket.pc
-testapp
-vbuckettool
+/testapp
+/vbuckettool
