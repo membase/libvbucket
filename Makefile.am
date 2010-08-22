@@ -6,7 +6,7 @@
 # the COPYING file in this directory for full text.
 ACLOCAL_AMFLAGS = -I m4 --force
 
-bin_PROGRAMS = vbuckettool
+bin_PROGRAMS = vbuckettool vbucketkeygen
 EXTRA_DIST = docs Doxyfile LICENSE README.markdown
 
 pkginclude_HEADERS = \
@@ -101,6 +101,10 @@ libvbucket_la_LIBADD= ${LTLIBHASHKIT}
 vbuckettool_SOURCES = src/vbuckettool.c
 vbuckettool_DEPENDENCIES= libvbucket.la
 vbuckettool_LDADD= libvbucket.la ${LTLIBHASHKIT}
+
+vbucketkeygen_SOURCES = src/vbucketkeygen.c
+vbucketkeygen_DEPENDENCIES= libvbucket.la
+vbucketkeygen_LDADD= libvbucket.la ${LTLIBHASHKIT}
 
 test: check-TESTS
 
