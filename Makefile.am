@@ -7,6 +7,7 @@
 ACLOCAL_AMFLAGS = -I m4 --force
 
 bin_PROGRAMS = vbuckettool
+EXTRA_DIST = docs Doxyfile LICENSE README.markdown
 
 pkginclude_HEADERS = \
                      include/libvbucket/vbucket.h \
