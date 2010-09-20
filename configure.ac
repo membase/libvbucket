@@ -88,7 +88,7 @@ AS_IF(test "$with_docs" = "no",
     echo "*****"
     echo "*"
     echo "*  WARNING: You are not generating any documentation."
-    echo "*           Please don't ship libmvbucket to an end user"
+    echo "*           Please don't ship libvbucket to an end user"
     echo "*           without documentation..."
     echo "*"
     echo "*****"
