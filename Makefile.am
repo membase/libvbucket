@@ -95,7 +95,16 @@ libvbucket_la_SOURCES= \
                         src/cJSON.c \
                         src/cJSON.h \
                         src/vbucket.c
-libvbucket_la_LDFLAGS=
+
+#
+# To ensure that we don't break applications in mysterious ways we need
+# to version our library. For a detailed description, check out:
+# http://www.gnu.org/software/libtool/manual/libtool.html#Libtool-versioning
+#
+current=0
+revision=0
+age=0
+libvbucket_la_LDFLAGS= -version-info $(current):$(revision):$(age) -no-undefined
 libvbucket_la_LIBADD= ${LTLIBHASHKIT}
 
 vbuckettool_SOURCES = src/vbuckettool.c
