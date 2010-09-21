@@ -36,13 +36,14 @@ int main(void) {
             fprintf(stderr, "  key: %s vBucketId: %d master: %s", key1, v, master);
             int num_replicas = vbucket_config_get_num_replicas(h);
 	    if (num_replicas > 0) {
-	      printf(" replicas:");
-	      for (int j = 0; j < num_replicas; j++) {
-                int r = vbucket_get_replica(h, v, j);
-                const char *replica = vbucket_config_get_server(h, r);
-                printf(" %s", replica);
-	      }
+               fprintf(stderr, " replicas:");
+               for (int j = 0; j < num_replicas; j++) {
+                  int r = vbucket_get_replica(h, v, j);
+                  const char *replica = vbucket_config_get_server(h, r);
+                  fprintf(stderr, " %s", replica == NULL ? "(null)" : replica);
+               }
 	    }
+            fprintf(stderr, "\n");
             vbucket_config_destroy(h);
          }
       }
