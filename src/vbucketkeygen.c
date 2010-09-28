@@ -32,7 +32,7 @@ int main(int argc, char **argv) {
         printf("  You may use '-' instead for the filename to specify stdin.\n\n");
         printf("  Examples:\n");
         printf("    ./vbucketkeygen file.json 10 10000\n\n");
-        printf("    curl http://HOST:8080/pools/default/buckets/default | \\\n");
+        printf("    curl http://HOST:8091/pools/default/buckets/default | \\\n");
         printf("       ./vbucketkeygen - 5 10000\n");
         exit(1);
     }

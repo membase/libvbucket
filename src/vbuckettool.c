@@ -28,7 +28,7 @@ int main(int argc, char **argv) {
         printf("  You may use '-' instead for the filename to specify stdin.\n\n");
         printf("  Examples:\n");
         printf("    ./vbuckettool file.json some_key another_key\n\n");
-        printf("    curl http://HOST:8080/pools/default/buckets/default | \\\n");
+        printf("    curl http://HOST:8091/pools/default/buckets/default | \\\n");
         printf("       ./vbuckettool - some_key another_key\n");
         exit(1);
     }
