@@ -65,6 +65,10 @@ int main(int argc, char **argv) {
             printf(" replicas:");
             for (int j = 0; j < num_replicas; j++) {
                 int r = vbucket_get_replica(vb, v, j);
+                if (r == -1) {
+                    break;
+                }
+
                 const char *replica = vbucket_config_get_server(vb, r);
                 if (replica != NULL) {
                     printf(" %s", replica);
