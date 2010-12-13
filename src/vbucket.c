@@ -78,6 +78,20 @@ static hashkit_hash_algorithm_t lookup_hash_algorithm(const char *s) {
     return HASHKIT_HASH_MAX;
 }
 
+static void set_username(struct vbucket_config_st *vbc, const char *user)
+{
+    if (vbc->user == NULL && user != NULL && strcmp(user, "default") != 0) {
+        vbc->user = strdup(user);
+    }
+}
+
+static void set_password(struct vbucket_config_st *vbc, const char *password)
+{
+    if (vbc->password == NULL && password != NULL) {
+        vbc->password = strdup(password);
+    }
+}
+
 static struct vbucket_config_st *config_create(char *hash_algorithm,
                                                int num_servers,
                                                int num_vbuckets,
@@ -109,13 +123,8 @@ static struct vbucket_config_st *config_create(char *hash_algorithm,
     vb->num_vbuckets = num_vbuckets;
     vb->num_replicas = num_replicas;
     vb->mask = num_vbuckets - 1;
-
-    if (user != NULL) {
-        vb->user = strdup(user);
-    }
-    if (password != NULL) {
-        vb->password = strdup(password);
-    }
+    set_username(vb, user);
+    set_password(vb, password);
 
     return vb;
 }
@@ -125,15 +134,10 @@ void vbucket_config_destroy(VBUCKET_CONFIG_HANDLE vb) {
         free(vb->servers[i]);
     }
     free(vb->servers);
-    if (vb->user != NULL) {
-        free(vb->user);
-    }
-    if (vb->password != NULL) {
-        free(vb->password);
-    }
-    if (vb->fvbuckets != NULL) {
-        free(vb->fvbuckets);
-    }
+    free(vb->user);
+    free(vb->password);
+    free(vb->fvbuckets);
+    memset(vb, 0xff, sizeof(vb));
     free(vb);
 }
 
@@ -187,10 +191,23 @@ static int populate_buckets(struct vbucket_config_st *vb, cJSON *c, int is_ft) {
     return 0;
 }
 
+static char *get_char_val(cJSON *c, const char *key) {
+    cJSON *obj = cJSON_GetObjectItem(c, key);
+    return (obj != NULL && obj->type == cJSON_String) ? obj->valuestring : NULL;
+}
+
 static VBUCKET_CONFIG_HANDLE parse_cjson(cJSON *c) {
+    char *user = get_char_val(c, "name");
+    char *password = get_char_val(c, "saslPassword");
+
     cJSON *body = cJSON_GetObjectItem(c, "vBucketServerMap");
     if (body != NULL) {
-        return parse_cjson(body); // Allows clients to have a JSON envelope.
+        VBUCKET_CONFIG_HANDLE ret = parse_cjson(body); // Allows clients to have a JSON envelope.
+        if (ret != NULL) {
+            set_username(ret, user);
+            set_password(ret, password);
+        }
+        return ret;
     }
 
     cJSON *jHashAlgorithm = cJSON_GetObjectItem(c, "hashAlgorithm");
@@ -240,17 +257,6 @@ static VBUCKET_CONFIG_HANDLE parse_cjson(cJSON *c) {
         return NULL;
     }
 
-    char *user = NULL;
-    cJSON *jUser = cJSON_GetObjectItem(c, "user");
-    if (jUser != NULL && jUser->type == cJSON_String) {
-        user = jUser->valuestring;
-    }
-
-    char *password = NULL;
-    cJSON *jPassword = cJSON_GetObjectItem(c, "password");
-    if (jPassword != NULL && jPassword->type == cJSON_String) {
-        password = jPassword->valuestring;
-    }
 
     struct vbucket_config_st *vb = config_create(hashAlgorithm, numServers,
                                                  numBuckets, numReplicas,
