@@ -6,6 +6,7 @@
 *.dirstamp
 *.exe
 *.l[ao]
+*.obj
 *~
 .deps/
 .libs/
@@ -31,6 +32,9 @@
 /configure
 /docs/doxy
 /libtool
+/libvbucket.dll
+/libvbucket.exp
+/libvbucket.lib
 /libvbucket.pc
 /m4/libtool.m4
 /m4/ltoptions.m4
@@ -41,5 +45,6 @@
 /regression
 /stamp-h1
 /testapp
+/vc100.pdb
 /vbucketkeygen
 /vbuckettool

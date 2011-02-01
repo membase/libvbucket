@@ -21,6 +21,12 @@
 #define LIBVBUCKET_PUBLIC_API __global
 #elif defined __GNUC__
 #define LIBVBUCKET_PUBLIC_API __attribute__ ((visibility("default")))
+#elif defined(_MSC_VER)
+#ifdef BUILDING_LIBVBUCKET
+#define LIBVBUCKET_PUBLIC_API extern __declspec(dllexport)
+#else
+#define LIBVBUCKET_PUBLIC_API extern __declspec(dllimport)
+#endif
 #else
 #define LIBVBUCKET_PUBLIC_API
 #endif

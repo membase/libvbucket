@@ -65,6 +65,7 @@ const char *vbucket_get_error() {
 
 static hashkit_hash_algorithm_t lookup_hash_algorithm(const char *s) {
     static char *hashes[HASHKIT_HASH_MAX];
+    unsigned int i;
     hashes[HASHKIT_HASH_DEFAULT] = "default";
     hashes[HASHKIT_HASH_MD5] = "md5";
     hashes[HASHKIT_HASH_CRC] = "crc";
@@ -75,7 +76,7 @@ static hashkit_hash_algorithm_t lookup_hash_algorithm(const char *s) {
     hashes[HASHKIT_HASH_HSIEH] = "hsieh";
     hashes[HASHKIT_HASH_MURMUR] = "murmur";
     hashes[HASHKIT_HASH_JENKINS] = "jenkins";
-    for (unsigned int i = 0; i < sizeof(hashes); ++i) {
+    for (i = 0; i < sizeof(hashes); ++i) {
         if (hashes[i] != NULL && strcasecmp(s, hashes[i]) == 0) {
             return i;
         }
@@ -102,15 +103,17 @@ static struct vbucket_config_st *config_create(char *hash_algorithm,
                                                int num_vbuckets,
                                                int num_replicas,
                                                char *user,
-                                               char *password) {
+                                               char *password)
+{
+    struct vbucket_config_st *vb;
     hashkit_hash_algorithm_t ha = lookup_hash_algorithm(hash_algorithm);
     if (ha == HASHKIT_HASH_MAX) {
         errstr = "Bogus hash algorithm specified";
         return NULL;
     }
 
-    struct vbucket_config_st *vb = calloc(sizeof(struct vbucket_config_st) +
-                                          sizeof(struct vbucket_st) * num_vbuckets, 1);
+    vb = calloc(sizeof(struct vbucket_config_st) +
+                sizeof(struct vbucket_st) * num_vbuckets, 1);
     if (vb == NULL) {
         errstr = "Failed to allocate vbucket config struct";
         return NULL;
@@ -135,11 +138,10 @@ static struct vbucket_config_st *config_create(char *hash_algorithm,
 }
 
 void vbucket_config_destroy(VBUCKET_CONFIG_HANDLE vb) {
-    for (int i = 0; i < vb->num_servers; ++i) {
+    int i;
+    for (i = 0; i < vb->num_servers; ++i) {
         free(vb->servers[i].authority);
-        if (vb->servers[i].couchdb_api_base) {
-            free(vb->servers[i].couchdb_api_base);
-        }
+        free(vb->servers[i].couchdb_api_base);
     }
     free(vb->servers);
     free(vb->user);
@@ -150,13 +152,15 @@ void vbucket_config_destroy(VBUCKET_CONFIG_HANDLE vb) {
 }
 
 static int populate_servers(struct vbucket_config_st *vb, cJSON *c) {
-    for (int i = 0; i < vb->num_servers; ++i) {
+    int i;
+    for (i = 0; i < vb->num_servers; ++i) {
+        char *server;
         cJSON *jServer = cJSON_GetArrayItem(c, i);
         if (jServer == NULL || jServer->type != cJSON_String) {
             errstr = "Expected array of strings for serverList";
             return -1;
         }
-        char *server = strdup(jServer->valuestring);
+        server = strdup(jServer->valuestring);
         if (server == NULL) {
             errstr = "Failed to allocate storage for server string";
             return -1;
@@ -236,8 +240,9 @@ static int populate_node_info(struct vbucket_config_st *vb, cJSON *c) {
     return 0;
 }
 
-static int populate_buckets(struct vbucket_config_st *vb, cJSON *c, int is_ft) {
-
+static int populate_buckets(struct vbucket_config_st *vb, cJSON *c, int is_ft)
+{
+    int i, j;
     struct vbucket_st *vbucket_map = NULL;
 
     if (is_ft) {
@@ -249,14 +254,14 @@ static int populate_buckets(struct vbucket_config_st *vb, cJSON *c, int is_ft) {
 
     vbucket_map = (is_ft ? vb->fvbuckets : vb->vbuckets);
 
-    for (int i = 0; i < vb->num_vbuckets; ++i) {
+    for (i = 0; i < vb->num_vbuckets; ++i) {
         cJSON *jBucket = cJSON_GetArrayItem(c, i);
         if (jBucket == NULL || jBucket->type != cJSON_Array ||
             cJSON_GetArraySize(jBucket) != vb->num_replicas + 1) {
             errstr = "Expected array of arrays each with numReplicas + 1 ints for vBucketMap";
             return -1;
         }
-        for (int j = 0; j < vb->num_replicas + 1; ++j) {
+        for (j = 0; j < vb->num_replicas + 1; ++j) {
             cJSON *jServerId = cJSON_GetArrayItem(jBucket, j);
             if (jServerId == NULL || jServerId->type != cJSON_Number ||
                 jServerId->valueint < -1 || jServerId->valueint >= vb->num_servers) {
@@ -274,18 +279,34 @@ static char *get_char_val(cJSON *c, const char *key) {
     return (obj != NULL && obj->type == cJSON_String) ? obj->valuestring : NULL;
 }
 
-static VBUCKET_CONFIG_HANDLE parse_cjson(cJSON *c) {
-    char *user = get_char_val(c, "name");
-    char *password = get_char_val(c, "saslPassword");
+static VBUCKET_CONFIG_HANDLE parse_cjson(cJSON *c)
+{
+    char *user;
+    char *password;
+    cJSON *body;
+    cJSON *jHashAlgorithm;
+    char *hashAlgorithm;
+    cJSON *jNumReplicas;
+    int numReplicas;
+    cJSON *jServers;
+    int numServers;
+    cJSON *jBuckets;
+    cJSON *jBucketsForward;
+    int numBuckets;
+    struct vbucket_config_st *vb;
 
-    cJSON *body = cJSON_GetObjectItem(c, "vBucketServerMap");
+    user = get_char_val(c, "name");
+    password = get_char_val(c, "saslPassword");
+
+    body = cJSON_GetObjectItem(c, "vBucketServerMap");
     if (body != NULL) {
         VBUCKET_CONFIG_HANDLE ret = parse_cjson(body); // Allows clients to have a JSON envelope.
         if (ret != NULL) {
+            cJSON *jNodes;
             set_username(ret, user);
             set_password(ret, password);
 
-            cJSON *jNodes = cJSON_GetObjectItem(c, "nodes");
+            jNodes = cJSON_GetObjectItem(c, "nodes");
             if (jNodes) {
                 if (jNodes->type != cJSON_Array) {
                     errstr = "Expected array for nodes";
@@ -300,55 +321,56 @@ static VBUCKET_CONFIG_HANDLE parse_cjson(cJSON *c) {
         return ret;
     }
 
-    cJSON *jHashAlgorithm = cJSON_GetObjectItem(c, "hashAlgorithm");
+
+    jHashAlgorithm = cJSON_GetObjectItem(c, "hashAlgorithm");
     if (jHashAlgorithm == NULL || jHashAlgorithm->type != cJSON_String) {
         errstr = "Expected string for hashAlgorithm";
         return NULL;
     }
-    char *hashAlgorithm = jHashAlgorithm->valuestring;
+    hashAlgorithm = jHashAlgorithm->valuestring;
 
-    cJSON *jNumReplicas = cJSON_GetObjectItem(c, "numReplicas");
+    jNumReplicas = cJSON_GetObjectItem(c, "numReplicas");
     if (jNumReplicas == NULL || jNumReplicas->type != cJSON_Number ||
         jNumReplicas->valueint > MAX_REPLICAS) {
         errstr = "Expected number <= " STRINGIFY(MAX_REPLICAS) " for numReplicas";
         return NULL;
     }
-    int numReplicas = jNumReplicas->valueint;
+    numReplicas = jNumReplicas->valueint;
 
-    cJSON *jServers = cJSON_GetObjectItem(c, "serverList");
+    jServers = cJSON_GetObjectItem(c, "serverList");
     if (jServers == NULL || jServers->type != cJSON_Array) {
         errstr = "Expected array for serverList";
         return NULL;
     }
 
-    int numServers = cJSON_GetArraySize(jServers);
+    numServers = cJSON_GetArraySize(jServers);
     if (numServers == 0) {
         errstr = "Empty serverList";
         return NULL;
     }
 
-    cJSON *jBuckets = cJSON_GetObjectItem(c, "vBucketMap");
+    jBuckets = cJSON_GetObjectItem(c, "vBucketMap");
     if (jBuckets == NULL || jBuckets->type != cJSON_Array) {
         errstr = "Expected array for vBucketMap";
         return NULL;
     }
 
     /* this could possibly be null */
-    cJSON *jBucketsForward = cJSON_GetObjectItem(c, "vBucketMapForward");
+    jBucketsForward = cJSON_GetObjectItem(c, "vBucketMapForward");
     if (jBuckets && jBuckets->type != cJSON_Array) {
         errstr = "Expected array for vBucketMap";
         return NULL;
     }
 
 
-    int numBuckets = cJSON_GetArraySize(jBuckets);
+    numBuckets = cJSON_GetArraySize(jBuckets);
     if (numBuckets == 0 || (numBuckets & (numBuckets - 1)) != 0) {
         errstr = "Number of buckets must be a power of two > 0 and <= " STRINGIFY(MAX_BUCKETS);
         return NULL;
     }
-    struct vbucket_config_st *vb = config_create(hashAlgorithm, numServers,
-                                                 numBuckets, numReplicas,
-                                                 user, password);
+
+    vb = config_create(hashAlgorithm, numServers, numBuckets, numReplicas,
+                       user, password);
     if (vb == NULL) {
         return NULL;
     }
@@ -374,45 +396,52 @@ static VBUCKET_CONFIG_HANDLE parse_cjson(cJSON *c) {
 }
 
 VBUCKET_CONFIG_HANDLE vbucket_config_parse_string(const char *data) {
+    VBUCKET_CONFIG_HANDLE vb;
     cJSON *c = cJSON_Parse(data);
     errstr = "Failed to parse data";
     if (c == NULL) {
         return NULL;
     }
 
-    VBUCKET_CONFIG_HANDLE vb = parse_cjson(c);
+    vb = parse_cjson(c);
 
     cJSON_Delete(c);
     return vb;
 }
 
-VBUCKET_CONFIG_HANDLE vbucket_config_parse_file(const char *filename) {
+VBUCKET_CONFIG_HANDLE vbucket_config_parse_file(const char *filename)
+{
+    long size;
+    char *data;
+    size_t nread;
+    VBUCKET_CONFIG_HANDLE h;
+
     FILE *f = fopen(filename, "r");
     if (f == NULL) {
         errstr = "Unable to open file";
         return NULL;
     }
     fseek(f, 0, SEEK_END);
-    long size = ftell(f);
+    size = ftell(f);
     fseek(f, 0, SEEK_SET);
     if (size > MAX_CONFIG_SIZE) {
         fclose(f);
         errstr = "File too large";
         return NULL;
     }
-    char *data = calloc(sizeof(char), size+1);
+    data = calloc(sizeof(char), size+1);
     if (data == NULL) {
         errstr = "Unable to allocate buffer to read file";
         return NULL;
     }
-    size_t nread = fread(data, sizeof(char), size+1, f);
+    nread = fread(data, sizeof(char), size+1, f);
     fclose(f);
     if (nread != (size_t)size) {
         free(data);
         errstr = "Failed to read entire file";
         return NULL;
     }
-    VBUCKET_CONFIG_HANDLE h = vbucket_config_parse_string(data);
+    h = vbucket_config_parse_string(data);
     free(data);
     return h;
 }
@@ -485,10 +514,11 @@ static void compute_vb_list_diff(VBUCKET_CONFIG_HANDLE from,
                                  VBUCKET_CONFIG_HANDLE to,
                                  char **out) {
     int offset = 0;
-    for (int i = 0; i < to->num_servers; i++) {
+    int i, j;
+    for (i = 0; i < to->num_servers; i++) {
         bool found = false;
         const char *sn = vbucket_config_get_server(to, i);
-        for (int j = 0; !found && j < from->num_servers; j++) {
+        for (j = 0; !found && j < from->num_servers; j++) {
             const char *sn2 = vbucket_config_get_server(from, j);
             found |= (strcmp(sn2, sn) == 0);
         }
@@ -503,11 +533,9 @@ static void compute_vb_list_diff(VBUCKET_CONFIG_HANDLE from,
 VBUCKET_CONFIG_DIFF* vbucket_compare(VBUCKET_CONFIG_HANDLE from,
                                      VBUCKET_CONFIG_HANDLE to) {
     VBUCKET_CONFIG_DIFF *rv = calloc(1, sizeof(VBUCKET_CONFIG_DIFF));
-    assert(rv);
-
     int num_servers = (from->num_servers > to->num_servers
                        ? from->num_servers : to->num_servers) + 1;
-
+    assert(rv);
     rv->servers_added = calloc(num_servers, sizeof(char*));
     rv->servers_removed = calloc(num_servers, sizeof(char*));
 
@@ -517,8 +545,9 @@ VBUCKET_CONFIG_DIFF* vbucket_compare(VBUCKET_CONFIG_HANDLE from,
 
     /* Verify the servers are equal in their positions */
     if (to->num_servers == from->num_servers) {
+        int i;
         rv->sequence_changed = false;
-        for (int i = 0; i < from->num_servers; i++) {
+        for (i = 0; i < from->num_servers; i++) {
             rv->sequence_changed |= (0 != strcmp(vbucket_config_get_server(from, i),
                                                  vbucket_config_get_server(to, i)));
 
@@ -543,7 +572,8 @@ VBUCKET_CONFIG_DIFF* vbucket_compare(VBUCKET_CONFIG_HANDLE from,
 
     /* Count the number of vbucket differences */
     if (to->num_vbuckets == from->num_vbuckets) {
-        for (int i = 0; i < to->num_vbuckets; i++) {
+        int i;
+        for (i = 0; i < to->num_vbuckets; i++) {
             rv->n_vb_changes += (vbucket_get_master(from, i)
                                  == vbucket_get_master(to, i)) ? 0 : 1;
         }
@@ -555,7 +585,8 @@ VBUCKET_CONFIG_DIFF* vbucket_compare(VBUCKET_CONFIG_HANDLE from,
 }
 
 static void free_array_helper(char **l) {
-    for (int i = 0; l[i]; i++) {
+    int i;
+    for (i = 0; l[i]; i++) {
         free(l[i]);
     }
     free(l);
