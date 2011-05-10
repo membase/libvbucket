@@ -65,6 +65,10 @@ AS_IF([test "$with_docs" = "yes"],
   ])
 AM_CONDITIONAL(BUILD_DOCS, test "$with_docs" = "yes")
 
+AC_SEARCH_LIBS(floor, m)
+AC_SEARCH_LIBS(pow, m)
+AC_SEARCH_LIBS(fabs, m)
+
 dnl ----------------------------------------------------------------------------
 
 AC_CONFIG_FILES(Makefile libvbucket.pc)
