@@ -35,6 +35,11 @@
 #define MAX_REPLICAS 4
 #define STRINGIFY(X) #X
 
+struct server_st {
+    char *authority;        /* host:port */
+    char *couchdb_api_base;
+};
+
 struct vbucket_st {
     int servers[MAX_REPLICAS + 1];
 };
@@ -47,7 +52,7 @@ struct vbucket_config_st {
     int num_replicas;
     char *user;
     char *password;
-    char **servers;
+    struct server_st *servers;
     struct vbucket_st *fvbuckets;
     struct vbucket_st vbuckets[];
 };
@@ -113,7 +118,7 @@ static struct vbucket_config_st *config_create(char *hash_algorithm,
 
     vb->hk_algorithm = ha;
 
-    vb->servers = calloc(sizeof(char*), num_servers);
+    vb->servers = calloc(sizeof(struct server_st), num_servers);
     if (vb->servers == NULL) {
         free(vb);
         errstr = "Failed to allocate servers array";
@@ -131,7 +136,10 @@ static struct vbucket_config_st *config_create(char *hash_algorithm,
 
 void vbucket_config_destroy(VBUCKET_CONFIG_HANDLE vb) {
     for (int i = 0; i < vb->num_servers; ++i) {
-        free(vb->servers[i]);
+        free(vb->servers[i].authority);
+        if (vb->servers[i].couchdb_api_base) {
+            free(vb->servers[i].couchdb_api_base);
+        }
     }
     free(vb->servers);
     free(vb->user);
@@ -153,7 +161,77 @@ static int populate_servers(struct vbucket_config_st *vb, cJSON *c) {
             errstr = "Failed to allocate storage for server string";
             return -1;
         }
-        vb->servers[i] = server;
+        vb->servers[i].authority = server;
+    }
+    return 0;
+}
+
+static int lookup_server_struct(struct vbucket_config_st *vb, cJSON *c) {
+    char *authority = NULL, *hostname = NULL, *colon = NULL;
+    int port = -1, idx = -1, ii;
+
+    cJSON *obj = cJSON_GetObjectItem(c, "hostname");
+    if (obj == NULL || obj->type != cJSON_String) {
+        errstr = "Expected string for node's hostname";
+        return -1;
+    }
+    hostname = obj->valuestring;
+    obj = cJSON_GetObjectItem(c, "ports");
+    if (obj == NULL || obj->type != cJSON_Object) {
+        errstr = "Expected object for node's ports";
+        return -1;
+    }
+    obj = cJSON_GetObjectItem(obj, "direct");
+    if (obj == NULL || obj->type != cJSON_Number) {
+        errstr = "Expected number for node's direct port";
+        return -1;
+    }
+    port = obj->valueint;
+    authority = calloc(strlen(hostname) + 6, sizeof(char)); /* hostname+port */
+    if (authority == NULL) {
+        errstr = "Failed to allocate storage for authority string";
+        return -1;
+    }
+    sprintf(authority, "%s", hostname);
+    colon = strchr(authority, ':');
+    if (!colon) {
+        colon = authority + strlen(authority);
+    }
+    sprintf(colon, ":%d", port);
+
+    for (ii = 0; ii < vb->num_servers; ++ii) {
+        if (strcmp(vb->servers[ii].authority, authority) == 0) {
+            idx = ii;
+        }
+    }
+
+    free(authority);
+    return idx;
+}
+
+static int populate_node_info(struct vbucket_config_st *vb, cJSON *c) {
+    int idx, ii;
+
+    for (ii = 0; ii < cJSON_GetArraySize(c); ++ii) {
+        cJSON *jNode = cJSON_GetArrayItem(c, ii);
+        if (jNode) {
+            if (jNode->type != cJSON_Object) {
+                errstr = "Expected object for nodes array item";
+                return -1;
+            }
+
+            if ((idx = lookup_server_struct(vb, jNode)) >= 0) {
+                cJSON *obj = cJSON_GetObjectItem(jNode, "couchApiBase");
+                if (obj != NULL) {
+                    char *value = strdup(obj->valuestring);
+                    if (value == NULL) {
+                        errstr = "Failed to allocate storage for couchApiBase string";
+                        return -1;
+                    }
+                    vb->servers[idx].couchdb_api_base = value;
+                }
+            }
+        }
     }
     return 0;
 }
@@ -206,6 +284,18 @@ static VBUCKET_CONFIG_HANDLE parse_cjson(cJSON *c) {
         if (ret != NULL) {
             set_username(ret, user);
             set_password(ret, password);
+
+            cJSON *jNodes = cJSON_GetObjectItem(c, "nodes");
+            if (jNodes) {
+                if (jNodes->type != cJSON_Array) {
+                    errstr = "Expected array for nodes";
+                    return NULL;
+                }
+                if (populate_node_info(ret, jNodes) != 0) {
+                    vbucket_config_destroy(ret);
+                    return NULL;
+                }
+            }
         }
         return ret;
     }
@@ -256,8 +346,6 @@ static VBUCKET_CONFIG_HANDLE parse_cjson(cJSON *c) {
         errstr = "Number of buckets must be a power of two > 0 and <= " STRINGIFY(MAX_BUCKETS);
         return NULL;
     }
-
-
     struct vbucket_config_st *vb = config_create(hashAlgorithm, numServers,
                                                  numBuckets, numReplicas,
                                                  user, password);
@@ -341,8 +429,12 @@ int vbucket_config_get_num_servers(VBUCKET_CONFIG_HANDLE vb) {
     return vb->num_servers;
 }
 
+const char *vbucket_config_get_couch_api_base(VBUCKET_CONFIG_HANDLE vb, int i) {
+    return vb->servers[i].couchdb_api_base;
+}
+
 const char *vbucket_config_get_server(VBUCKET_CONFIG_HANDLE vb, int i) {
-    return vb->servers[i];
+    return vb->servers[i].authority;
 }
 
 const char *vbucket_config_get_user(VBUCKET_CONFIG_HANDLE vb) {

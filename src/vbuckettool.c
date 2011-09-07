@@ -60,7 +60,8 @@ int main(int argc, char **argv) {
         int v = vbucket_get_vbucket_by_key(vb, key, strlen(key));
         int m = vbucket_get_master(vb, v);
         const char *master = vbucket_config_get_server(vb, m);
-        printf("key: %s vBucketId: %d master: %s", key, v, master);
+        const char *couch_api_base = vbucket_config_get_couch_api_base(vb, m);
+        printf("key: %s vBucketId: %d master: %s couchApiBase: %s", key, v, master, couch_api_base);
         if (num_replicas > 0) {
             printf(" replicas:");
             for (int j = 0; j < num_replicas; j++) {

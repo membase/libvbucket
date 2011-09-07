@@ -1,3 +1,5 @@
+/* -*- Mode: C; tab-width: 4; c-basic-offset: 4; indent-tabs-mode: nil -*- */
+
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -382,6 +384,75 @@ static void testConfigUserPassword(void) {
     vbucket_config_destroy(vb2);
 }
 
+static void testConfigCouchApiBase(void)
+{
+    const char *cfg =
+        "{                                                             "
+        "  \"nodes\": [                                                "
+        "    {                                                         "
+        "      \"hostname\": \"192.168.2.123:9000\",                   "
+        "      \"couchApiBase\": \"http://192.168.2.123:9502/default\","
+        "      \"ports\": {                                            "
+        "        \"proxy\": 12005,                                     "
+        "        \"direct\": 12004                                     "
+        "      }                                                       "
+        "    },                                                        "
+        "    {                                                         "
+        "      \"hostname\": \"192.168.2.123:9000\",                   "
+        "      \"couchApiBase\": \"http://192.168.2.123:9500/default\","
+        "      \"ports\": {                                            "
+        "        \"proxy\": 12001,                                     "
+        "        \"direct\": 12000                                     "
+        "      }                                                       "
+        "    },                                                        "
+        "    {                                                         "
+        "      \"hostname\": \"192.168.2.123:9000\",                   "
+        "      \"couchApiBase\": \"http://192.168.2.123:9501/default\","
+        "      \"ports\": {                                            "
+        "        \"proxy\": 12003,                                     "
+        "        \"direct\": 12002                                     "
+        "      }                                                       "
+        "    }                                                         "
+        "  ],                                                          "
+        "  \"vBucketServerMap\": {                                     "
+        "    \"hashAlgorithm\": \"CRC\",                               "
+        "    \"numReplicas\": 1,                                       "
+        "    \"serverList\": [                                         "
+        "      \"192.168.2.123:12000\",                                "
+        "      \"192.168.2.123:12002\",                                "
+        "      \"192.168.2.123:12004\"                                 "
+        "    ],                                                        "
+        "    \"vBucketMap\": [                                         "
+        "      [ 0, 1 ],                                               "
+        "      [ 0, 1 ],                                               "
+        "      [ 0, 1 ],                                               "
+        "      [ 1, 2 ],                                               "
+        "      [ 1, 2 ],                                               "
+        "      [ 2, 0 ],                                               "
+        "      [ 2, 1 ],                                               "
+        "      [ 2, 1 ],                                               "
+        "      [ 1, 0 ],                                               "
+        "      [ 1, 0 ],                                               "
+        "      [ 1, 0 ],                                               "
+        "      [ 0, 2 ],                                               "
+        "      [ 0, 2 ],                                               "
+        "      [ 0, 2 ],                                               "
+        "      [ 2, 0 ],                                               "
+        "      [ 2, 0 ]                                                "
+        "    ]                                                         "
+        "  }                                                           "
+        "}                                                             ";
+
+    VBUCKET_CONFIG_HANDLE vb = vbucket_config_parse_string(cfg);
+    assert(vb);
+    assert(strcmp(vbucket_config_get_couch_api_base(vb, 0), "http://192.168.2.123:9500/default") == 0);
+    assert(strcmp(vbucket_config_get_couch_api_base(vb, 1), "http://192.168.2.123:9501/default") == 0);
+    assert(strcmp(vbucket_config_get_couch_api_base(vb, 2), "http://192.168.2.123:9502/default") == 0);
+    assert(strcmp(vbucket_config_get_server(vb, 0), "192.168.2.123:12000") == 0);
+    assert(strcmp(vbucket_config_get_server(vb, 1), "192.168.2.123:12002") == 0);
+    assert(strcmp(vbucket_config_get_server(vb, 2), "192.168.2.123:12004") == 0);
+}
+
 int main(void) {
   testConfig(config);
   testConfig(configFlat);
@@ -393,6 +464,7 @@ int main(void) {
   testConfigDiff();
   testConfigDiffSame();
   testConfigUserPassword();
+  testConfigCouchApiBase();
 }
 
 

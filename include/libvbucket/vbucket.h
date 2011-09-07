@@ -201,6 +201,13 @@ extern "C" {
     const char *vbucket_config_get_server(VBUCKET_CONFIG_HANDLE h, int i);
 
     /**
+     * Get the CouchDB API endpoint at the given index.
+     *
+     * @return a string or NULL.
+     */
+    LIBVBUCKET_PUBLIC_API
+    const char *vbucket_config_get_couch_api_base(VBUCKET_CONFIG_HANDLE vb, int i);
+    /**
      * @}
      */
 
