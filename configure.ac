@@ -19,7 +19,6 @@ ac_cv_func_realloc_0_nonnull=yes
 
 
 PANDORA_CANONICAL_TARGET(less-warnings, warnings-always-on, force-gcc42)
-PANDORA_REQUIRE_LIBHASHKIT
 
 AH_TOP([
 #ifndef CONFIG_H

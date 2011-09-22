@@ -25,9 +25,8 @@
 #include <string.h>
 #include <strings.h>
 
-#include <libhashkit/hashkit.h>
-
 #include "cJSON.h"
+#include "hash.h"
 #include <libvbucket/vbucket.h>
 
 #define MAX_CONFIG_SIZE 100 * 1048576
@@ -45,7 +44,6 @@ struct vbucket_st {
 };
 
 struct vbucket_config_st {
-    hashkit_hash_algorithm_t hk_algorithm;
     int num_vbuckets;
     int mask;
     int num_servers;
@@ -61,27 +59,6 @@ static char *errstr = NULL;
 
 const char *vbucket_get_error() {
     return errstr;
-}
-
-static hashkit_hash_algorithm_t lookup_hash_algorithm(const char *s) {
-    static char *hashes[HASHKIT_HASH_MAX];
-    unsigned int i;
-    hashes[HASHKIT_HASH_DEFAULT] = "default";
-    hashes[HASHKIT_HASH_MD5] = "md5";
-    hashes[HASHKIT_HASH_CRC] = "crc";
-    hashes[HASHKIT_HASH_FNV1_64] = "fnv1_64";
-    hashes[HASHKIT_HASH_FNV1A_64] = "fnv1a_64";
-    hashes[HASHKIT_HASH_FNV1_32] = "fnv1_32";
-    hashes[HASHKIT_HASH_FNV1A_32] = "fnv1a_32";
-    hashes[HASHKIT_HASH_HSIEH] = "hsieh";
-    hashes[HASHKIT_HASH_MURMUR] = "murmur";
-    hashes[HASHKIT_HASH_JENKINS] = "jenkins";
-    for (i = 0; i < sizeof(hashes); ++i) {
-        if (hashes[i] != NULL && strcasecmp(s, hashes[i]) == 0) {
-            return i;
-        }
-    }
-    return HASHKIT_HASH_MAX;
 }
 
 static void set_username(struct vbucket_config_st *vbc, const char *user)
@@ -106,11 +83,10 @@ static struct vbucket_config_st *config_create(char *hash_algorithm,
                                                char *password)
 {
     struct vbucket_config_st *vb;
-    hashkit_hash_algorithm_t ha = lookup_hash_algorithm(hash_algorithm);
-    if (ha == HASHKIT_HASH_MAX) {
-        errstr = "Bogus hash algorithm specified";
-        return NULL;
-    }
+    /* ignore hash_algorithm for now because vbucket distribution supports
+     * only crc32 for currently. so far it is the internal thing, it could
+     * be changed seamlessly in the future */
+    (void)hash_algorithm;
 
     vb = calloc(sizeof(struct vbucket_config_st) +
                 sizeof(struct vbucket_st) * num_vbuckets, 1);
@@ -118,8 +94,6 @@ static struct vbucket_config_st *config_create(char *hash_algorithm,
         errstr = "Failed to allocate vbucket config struct";
         return NULL;
     }
-
-    vb->hk_algorithm = ha;
 
     vb->servers = calloc(sizeof(struct server_st), num_servers);
     if (vb->servers == NULL) {
@@ -475,7 +449,10 @@ const char *vbucket_config_get_password(VBUCKET_CONFIG_HANDLE vb) {
 }
 
 int vbucket_get_vbucket_by_key(VBUCKET_CONFIG_HANDLE vb, const void *key, size_t nkey) {
-    uint32_t digest = libhashkit_digest(key, nkey, vb->hk_algorithm);
+    /* call crc32 directly here it could be changed to some more general
+     * function when vbucket distribution will support multiple hashing
+     * algorithms */
+    uint32_t digest = hash_crc32(key, nkey);
     return digest & vb->mask;
 }
 

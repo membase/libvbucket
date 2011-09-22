@@ -16,6 +16,7 @@
 /a.out*
 /aclocal.m4
 /autom4te.cache
+/config.cache
 /config.h
 /config.h.in
 /config.log
@@ -45,6 +46,6 @@
 /regression
 /stamp-h1
 /testapp
-/vc100.pdb
 /vbucketkeygen
 /vbuckettool
+/vc100.pdb

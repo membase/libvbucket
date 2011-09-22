@@ -19,16 +19,18 @@ TARGETOS=WINNT
 
 INSTALL=c:\local
 INSTALLDIRS=$(INSTALL) $(INSTALL)\include $(INSTALL)\include\libvbucket $(INSTALL)\lib $(INSTALL)\bin
-LIBHASHKIT=$(INSTALL)
 
-libvbucket.dll: src\cJSON.obj src\vbucket.obj
-	$(link) $(dlllflags) /LIBPATH:$(LIBHASHKIT)\lib libhashkit.lib -out:libvbucket.dll -version:1.0 src\cJSON.obj src\vbucket.obj
+libvbucket.dll: src\cJSON.obj src\vbucket.obj src\crc32.obj
+	$(link) $(dlllflags) -out:libvbucket.dll -version:1.0 src\cJSON.obj src\vbucket.obj src\crc32.obj
+
+src\crc32.obj: src\crc32.c
+	$(cc) $(cdebug) $(cflags) $(cvarsdll) -D_CRT_SECURE_NO_WARNINGS -Fosrc\crc32.obj -Iwin32 -Iinclude -DLIBISASL_INTERNAL src\crc32.c
 
 src\cJSON.obj: src\cJSON.c
 	$(cc) $(cdebug) $(cflags) $(cvarsdll) -D_CRT_SECURE_NO_WARNINGS -Fosrc\cJSON.obj -Iwin32 -Iinclude -DLIBISASL_INTERNAL src\cJSON.c
 
 src\vbucket.obj: src\vbucket.c
-	$(cc) $(cdebug) $(cflags) $(cvarsdll) -DBUILDING_LIBVBUCKET=1 -D_CRT_SECURE_NO_WARNINGS -Fosrc\vbucket.obj -Iwin32 -Iinclude -DLIBISASL_INTERNAL -I$(LIBHASHKIT)\include src\vbucket.c
+	$(cc) $(cdebug) $(cflags) $(cvarsdll) -DBUILDING_LIBVBUCKET=1 -D_CRT_SECURE_NO_WARNINGS -Fosrc\vbucket.obj -Iwin32 -Iinclude -DLIBISASL_INTERNAL src\vbucket.c
 
 install: $(INSTALLDIRS) libvbucket.dll
 	copy include\libvbucket\*.h $(INSTALL)\include\libvbucket
@@ -40,5 +42,5 @@ install: $(INSTALLDIRS) libvbucket.dll
 $(INSTALL) $(INSTALL)\include $(INSTALL)\include\libvbucket $(INSTALL)\lib $(INSTALL)\bin:; -@mkdir $@
 
 clean:
-	-del libvbucket.dll libvbucket.exp libvbucket.lib src\cJSON.obj src\vbucket.obj vc100.pdb
+	-del libvbucket.dll libvbucket.exp libvbucket.lib src\cJSON.obj src\vbucket.obj src\crc32.obj vc100.pdb
 
