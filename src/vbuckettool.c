@@ -36,7 +36,7 @@ int main(int argc, char **argv) {
     VBUCKET_CONFIG_HANDLE vb = NULL;
 
     if (strcmp("-", argv[1]) == 0) {
-        char buf[50000];
+        char buf[500000];
         if (fgets(buf, sizeof(buf) - 1, stdin) == NULL) {
             fprintf(stderr, "ERROR: vbuckettool found no input on stdin\n");
             exit(1);
@@ -57,22 +57,30 @@ int main(int argc, char **argv) {
 
     for (int i = 2; i < argc; i++) {
         char *key = argv[i];
-        int v = vbucket_get_vbucket_by_key(vb, key, strlen(key));
-        int m = vbucket_get_master(vb, v);
-        const char *master = vbucket_config_get_server(vb, m);
-        const char *couch_api_base = vbucket_config_get_couch_api_base(vb, m);
-        printf("key: %s vBucketId: %d master: %s couchApiBase: %s", key, v, master, couch_api_base);
-        if (num_replicas > 0) {
-            printf(" replicas:");
-            for (int j = 0; j < num_replicas; j++) {
-                int r = vbucket_get_replica(vb, v, j);
-                if (r == -1) {
-                    break;
-                }
+        int v, m;
+        const char *master, *couch_api_base;
 
-                const char *replica = vbucket_config_get_server(vb, r);
-                if (replica != NULL) {
-                    printf(" %s", replica);
+        if (vbucket_map(vb, key, strlen(key), &v, &m) < -1) {
+            fprintf(stderr, "ERROR: vbucket_map(..., \"%s\", ...) error: %s\n", key, vbucket_get_error());
+            continue;
+        }
+        master = vbucket_config_get_server(vb, m);
+        couch_api_base = vbucket_config_get_couch_api_base(vb, m);
+        printf("key: %s master: %s", key, master);
+        if (vbucket_config_get_distribution_type(vb) == VBUCKET_DISTRIBUTION_VBUCKET) {
+            printf(" vBucketId: %d couchApiBase: %s", v, couch_api_base);
+            if (num_replicas > 0) {
+                printf(" replicas:");
+                for (int j = 0; j < num_replicas; j++) {
+                    int r = vbucket_get_replica(vb, v, j);
+                    if (r == -1) {
+                        break;
+                    }
+
+                    const char *replica = vbucket_config_get_server(vb, r);
+                    if (replica != NULL) {
+                        printf(" %s", replica);
+                    }
                 }
             }
         }

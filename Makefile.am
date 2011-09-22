@@ -71,14 +71,14 @@ vbucket_get_master.3vbucket: docs/vbucket.pod
 vbucket_get_replica.3vbucket: docs/vbucket.pod
 	${POD2MAN} -c "$*" -r "" -s 3lib $< $@
 
-
+noinst_LTLIBRARIES = libketama.la
 
 lib_LTLIBRARIES = libvbucket.la
 
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = libvbucket.pc
 
-check_PROGRAMS= testapp regression
+check_PROGRAMS= testapp regression testketama
 TESTS = ${check_PROGRAMS}
 
 # Test application to test stuff from C
@@ -89,6 +89,13 @@ testapp_LDADD= libvbucket.la
 regression_SOURCES = tests/regression.c
 regression_DEPENDENCIES= libvbucket.la
 regression_LDADD= libvbucket.la
+
+testketama_SOURCES = tests/testketama.c
+testketama_DEPENDENCIES= libvbucket.la libketama.la
+testketama_LDADD= libvbucket.la libketama.la
+
+libketama_la_SOURCES = src/ketama.c
+libketama_la_CFLAGS =  $(AM_CFLAGS) ${NO_WERROR}
 
 libvbucket_la_SOURCES= \
                         src/crc32.c \
@@ -106,6 +113,8 @@ current=0
 revision=0
 age=0
 libvbucket_la_LDFLAGS= -version-info $(current):$(revision):$(age) -no-undefined
+libvbucket_la_LIBADD = libketama.la
+libvbucket_la_DEPENDENCIES = libketama.la
 
 vbuckettool_SOURCES = src/vbuckettool.c
 vbuckettool_DEPENDENCIES= libvbucket.la

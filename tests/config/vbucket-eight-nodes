@@ -1,0 +1,367 @@
+{
+  "name": "default",
+  "bucketType": "membase",
+  "authType": "sasl",
+  "saslPassword": "",
+  "proxyPort": 0,
+  "uri": "/pools/default/buckets/default",
+  "streamingUri": "/pools/default/bucketsStreaming/default",
+  "flushCacheUri": "/pools/default/buckets/default/controller/doFlush",
+  "nodes": [
+    {
+      "systemStats": {
+        "cpu_utilization_rate": 8.478802992518704,
+        "swap_total": 7999582208,
+        "swap_used": 58335232
+      },
+      "interestingStats": {
+        "curr_items": 0,
+        "curr_items_tot": 0,
+        "vb_replica_curr_items": 0
+      },
+      "uptime": "240676",
+      "memoryTotal": 8308625408,
+      "memoryFree": 838696960,
+      "mcdMemoryReserved": 6338,
+      "mcdMemoryAllocated": 6338,
+      "couchApiBase": "http://172.16.16.76:9504/default",
+      "replication": 1.0,
+      "clusterMembership": "active",
+      "status": "healthy",
+      "hostname": "172.16.16.76:9004",
+      "clusterCompatibility": 1,
+      "version": "1.7.1_424_g209e7bf",
+      "os": "x86_64-pc-linux-gnu",
+      "ports": {
+        "proxy": 12009,
+        "direct": 12008
+      }
+    },
+    {
+      "systemStats": {
+        "cpu_utilization_rate": 8.478802992518704,
+        "swap_total": 7999582208,
+        "swap_used": 58335232
+      },
+      "interestingStats": {
+        "curr_items": 0,
+        "curr_items_tot": 0,
+        "vb_replica_curr_items": 0
+      },
+      "uptime": "240676",
+      "memoryTotal": 8308625408,
+      "memoryFree": 840982528,
+      "mcdMemoryReserved": 6338,
+      "mcdMemoryAllocated": 6338,
+      "couchApiBase": "http://172.16.16.76:9507/default",
+      "replication": 1.0,
+      "clusterMembership": "active",
+      "status": "healthy",
+      "hostname": "172.16.16.76:9007",
+      "clusterCompatibility": 1,
+      "version": "1.7.1_424_g209e7bf",
+      "os": "x86_64-pc-linux-gnu",
+      "ports": {
+        "proxy": 12015,
+        "direct": 12014
+      }
+    },
+    {
+      "systemStats": {
+        "cpu_utilization_rate": 9.669211195928753,
+        "swap_total": 7999582208,
+        "swap_used": 58335232
+      },
+      "interestingStats": {
+        "curr_items": 0,
+        "curr_items_tot": 0,
+        "vb_replica_curr_items": 0
+      },
+      "uptime": "240675",
+      "memoryTotal": 8308625408,
+      "memoryFree": 835903488,
+      "mcdMemoryReserved": 6338,
+      "mcdMemoryAllocated": 6338,
+      "couchApiBase": "http://172.16.16.76:9505/default",
+      "replication": 1.0,
+      "clusterMembership": "active",
+      "status": "healthy",
+      "hostname": "172.16.16.76:9005",
+      "clusterCompatibility": 1,
+      "version": "1.7.1_424_g209e7bf",
+      "os": "x86_64-pc-linux-gnu",
+      "ports": {
+        "proxy": 12011,
+        "direct": 12010
+      }
+    },
+    {
+      "systemStats": {
+        "cpu_utilization_rate": 8.478802992518704,
+        "swap_total": 7999582208,
+        "swap_used": 58335232
+      },
+      "interestingStats": {
+        "curr_items": 1,
+        "curr_items_tot": 1,
+        "vb_replica_curr_items": 0
+      },
+      "uptime": "240677",
+      "memoryTotal": 8308625408,
+      "memoryFree": 838696960,
+      "mcdMemoryReserved": 6338,
+      "mcdMemoryAllocated": 6338,
+      "couchApiBase": "http://172.16.16.76:9502/default",
+      "replication": 1.0,
+      "clusterMembership": "active",
+      "status": "healthy",
+      "hostname": "172.16.16.76:9002",
+      "clusterCompatibility": 1,
+      "version": "1.7.1_424_g209e7bf",
+      "os": "x86_64-pc-linux-gnu",
+      "ports": {
+        "proxy": 12005,
+        "direct": 12004
+      }
+    },
+    {
+      "systemStats": {
+        "cpu_utilization_rate": 7.788944723618091,
+        "swap_total": 7999582208,
+        "swap_used": 58335232
+      },
+      "interestingStats": {
+        "curr_items": 0,
+        "curr_items_tot": 0,
+        "vb_replica_curr_items": 0
+      },
+      "uptime": "240676",
+      "memoryTotal": 8308625408,
+      "memoryFree": 838696960,
+      "mcdMemoryReserved": 6338,
+      "mcdMemoryAllocated": 6338,
+      "couchApiBase": "http://172.16.16.76:9501/default",
+      "replication": 1.0,
+      "clusterMembership": "active",
+      "status": "healthy",
+      "hostname": "172.16.16.76:9001",
+      "clusterCompatibility": 1,
+      "version": "1.7.1_424_g209e7bf",
+      "os": "x86_64-pc-linux-gnu",
+      "ports": {
+        "proxy": 12003,
+        "direct": 12002
+      }
+    },
+    {
+      "systemStats": {
+        "cpu_utilization_rate": 8.25,
+        "swap_total": 7999582208,
+        "swap_used": 58335232
+      },
+      "interestingStats": {
+        "curr_items": 0,
+        "curr_items_tot": 1,
+        "vb_replica_curr_items": 1
+      },
+      "uptime": "240677",
+      "memoryTotal": 8308625408,
+      "memoryFree": 833871872,
+      "mcdMemoryReserved": 6338,
+      "mcdMemoryAllocated": 6338,
+      "couchApiBase": "http://172.16.16.76:9500/default",
+      "replication": 1.0,
+      "clusterMembership": "active",
+      "status": "healthy",
+      "thisNode": true,
+      "hostname": "172.16.16.76:9000",
+      "clusterCompatibility": 1,
+      "version": "1.7.1_424_g209e7bf",
+      "os": "x86_64-pc-linux-gnu",
+      "ports": {
+        "proxy": 12001,
+        "direct": 12000
+      }
+    },
+    {
+      "systemStats": {
+        "cpu_utilization_rate": 8.478802992518704,
+        "swap_total": 7999582208,
+        "swap_used": 58335232
+      },
+      "interestingStats": {
+        "curr_items": 0,
+        "curr_items_tot": 1,
+        "vb_replica_curr_items": 1
+      },
+      "uptime": "240676",
+      "memoryTotal": 8308625408,
+      "memoryFree": 840982528,
+      "mcdMemoryReserved": 6338,
+      "mcdMemoryAllocated": 6338,
+      "couchApiBase": "http://172.16.16.76:9503/default",
+      "replication": 1.0,
+      "clusterMembership": "active",
+      "status": "healthy",
+      "hostname": "172.16.16.76:9003",
+      "clusterCompatibility": 1,
+      "version": "1.7.1_424_g209e7bf",
+      "os": "x86_64-pc-linux-gnu",
+      "ports": {
+        "proxy": 12007,
+        "direct": 12006
+      }
+    },
+    {
+      "systemStats": {
+        "cpu_utilization_rate": 11.910669975186105,
+        "swap_total": 7999582208,
+        "swap_used": 58335232
+      },
+      "interestingStats": {
+        "curr_items": 0,
+        "curr_items_tot": 0,
+        "vb_replica_curr_items": 0
+      },
+      "uptime": "240675",
+      "memoryTotal": 8308625408,
+      "memoryFree": 838696960,
+      "mcdMemoryReserved": 6338,
+      "mcdMemoryAllocated": 6338,
+      "couchApiBase": "http://172.16.16.76:9506/default",
+      "replication": 1.0,
+      "clusterMembership": "active",
+      "status": "healthy",
+      "hostname": "172.16.16.76:9006",
+      "clusterCompatibility": 1,
+      "version": "1.7.1_424_g209e7bf",
+      "os": "x86_64-pc-linux-gnu",
+      "ports": {
+        "proxy": 12013,
+        "direct": 12012
+      }
+    }
+  ],
+  "stats": {
+    "uri": "/pools/default/buckets/default/stats",
+    "directoryURI": "/pools/default/buckets/default/statsDirectory",
+    "nodeStatsListURI": "/pools/default/buckets/default/nodes"
+  },
+  "nodeLocator": "vbucket",
+  "autoCompactionSettings": false,
+  "vBucketServerMap": {
+    "hashAlgorithm": "CRC",
+    "numReplicas": 2,
+    "serverList": [
+      "172.16.16.76:12000",
+      "172.16.16.76:12002",
+      "172.16.16.76:12004",
+      "172.16.16.76:12006",
+      "172.16.16.76:12008",
+      "172.16.16.76:12010",
+      "172.16.16.76:12012",
+      "172.16.16.76:12014"
+    ],
+    "vBucketMap": [
+      [
+        0,
+        1,
+        2
+      ],
+      [
+        0,
+        2,
+        3
+      ],
+      [
+        1,
+        0,
+        3
+      ],
+      [
+        1,
+        3,
+        2
+      ],
+      [
+        2,
+        0,
+        1
+      ],
+      [
+        2,
+        3,
+        0
+      ],
+      [
+        3,
+        1,
+        0
+      ],
+      [
+        3,
+        2,
+        1
+      ],
+      [
+        4,
+        5,
+        6
+      ],
+      [
+        4,
+        6,
+        7
+      ],
+      [
+        5,
+        4,
+        7
+      ],
+      [
+        5,
+        7,
+        6
+      ],
+      [
+        6,
+        4,
+        5
+      ],
+      [
+        6,
+        7,
+        4
+      ],
+      [
+        7,
+        5,
+        4
+      ],
+      [
+        7,
+        6,
+        5
+      ]
+    ]
+  },
+  "replicaNumber": 2,
+  "quota": {
+    "ram": 2516582400,
+    "rawRAM": 314572800
+  },
+  "basicStats": {
+    "quotaPercentUsed": 0.05072343349456787,
+    "opsPerSec": 0,
+    "diskFetches": 0,
+    "itemCount": 1,
+    "diskUsed": 660033,
+    "memUsed": 1276497
+  },
+  "bucketCapabilitiesVer": "sync-1.0",
+  "bucketCapabilities": [
+    "touch",
+    "sync",
+    "couchapi"
+  ]
+}

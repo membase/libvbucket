@@ -32,6 +32,7 @@
 #define MAX_CONFIG_SIZE 100 * 1048576
 #define MAX_BUCKETS 65536
 #define MAX_REPLICAS 4
+#define MAX_AUTORITY_SIZE 100
 #define STRINGIFY(X) #X
 
 struct server_st {
@@ -43,16 +44,24 @@ struct vbucket_st {
     int servers[MAX_REPLICAS + 1];
 };
 
+struct continuum_item_st {
+    uint32_t index;     /* server index */
+    uint32_t point;     /* point on the ketama continuum */
+};
+
 struct vbucket_config_st {
+    VBUCKET_DISTRIBUTION_TYPE distribution;
     int num_vbuckets;
     int mask;
     int num_servers;
     int num_replicas;
     char *user;
     char *password;
+    int num_continuum;                      /* count of continuum points */
+    struct continuum_item_st *continuum;    /* ketama continuum */
     struct server_st *servers;
     struct vbucket_st *fvbuckets;
-    struct vbucket_st vbuckets[];
+    struct vbucket_st *vbuckets;
 };
 
 static char *errstr = NULL;
@@ -61,54 +70,55 @@ const char *vbucket_get_error() {
     return errstr;
 }
 
-static void set_username(struct vbucket_config_st *vbc, const char *user)
+static int continuum_item_cmp(const void *t1, const void *t2)
 {
-    if (vbc->user == NULL && user != NULL && strcmp(user, "default") != 0) {
-        vbc->user = strdup(user);
+    const struct continuum_item_st *ct1 = t1, *ct2 = t2;
+
+    if (ct1->point == ct2->point) {
+        return 0;
+    } else if (ct1->point > ct2->point) {
+        return 1;
+    } else {
+        return -1;
     }
 }
 
-static void set_password(struct vbucket_config_st *vbc, const char *password)
+static void update_ketama_continuum(VBUCKET_CONFIG_HANDLE vb)
 {
-    if (vbc->password == NULL && password != NULL) {
-        vbc->password = strdup(password);
+    char host[MAX_AUTORITY_SIZE+10] = "";
+    int nhost;
+    int pp, hh, ss, nn;
+    unsigned char digest[16];
+    struct continuum_item_st *new_continuum, *old_continuum;
+
+    new_continuum = calloc(160 * vb->num_servers,
+                           sizeof(struct continuum_item_st));
+
+    /* 40 hashes, 4 numbers per hash = 160 points per server */
+    for (ss = 0, pp = 0; ss < vb->num_servers; ++ss) {
+        /* we can add more points to server which have more memory */
+        for (hh = 0; hh < 40; ++hh) {
+            nhost = snprintf(host, MAX_AUTORITY_SIZE+10, "%s-%u",
+                             vb->servers[ss].authority, hh);
+            hash_md5(host, nhost, digest);
+            for (nn = 0; nn < 4; ++nn, ++pp) {
+                new_continuum[pp].index = ss;
+                new_continuum[pp].point = ((uint32_t) (digest[3 + nn * 4] & 0xFF) << 24)
+                                        | ((uint32_t) (digest[2 + nn * 4] & 0xFF) << 16)
+                                        | ((uint32_t) (digest[1 + nn * 4] & 0xFF) << 8)
+                                        | (digest[0 + nn * 4] & 0xFF);
+            }
+        }
     }
-}
 
-static struct vbucket_config_st *config_create(char *hash_algorithm,
-                                               int num_servers,
-                                               int num_vbuckets,
-                                               int num_replicas,
-                                               char *user,
-                                               char *password)
-{
-    struct vbucket_config_st *vb;
-    /* ignore hash_algorithm for now because vbucket distribution supports
-     * only crc32 for currently. so far it is the internal thing, it could
-     * be changed seamlessly in the future */
-    (void)hash_algorithm;
+    qsort(new_continuum, pp, sizeof(struct continuum_item_st), continuum_item_cmp);
 
-    vb = calloc(sizeof(struct vbucket_config_st) +
-                sizeof(struct vbucket_st) * num_vbuckets, 1);
-    if (vb == NULL) {
-        errstr = "Failed to allocate vbucket config struct";
-        return NULL;
+    old_continuum = vb->continuum;
+    vb->continuum = new_continuum;
+    vb->num_continuum = pp;
+    if (old_continuum) {
+        free(old_continuum);
     }
-
-    vb->servers = calloc(sizeof(struct server_st), num_servers);
-    if (vb->servers == NULL) {
-        free(vb);
-        errstr = "Failed to allocate servers array";
-        return NULL;
-    }
-    vb->num_servers = num_servers;
-    vb->num_vbuckets = num_vbuckets;
-    vb->num_replicas = num_replicas;
-    vb->mask = num_vbuckets - 1;
-    set_username(vb, user);
-    set_password(vb, password);
-
-    return vb;
 }
 
 void vbucket_config_destroy(VBUCKET_CONFIG_HANDLE vb) {
@@ -127,6 +137,13 @@ void vbucket_config_destroy(VBUCKET_CONFIG_HANDLE vb) {
 
 static int populate_servers(struct vbucket_config_st *vb, cJSON *c) {
     int i;
+
+    vb->servers = calloc(vb->num_servers, sizeof(struct server_st));
+    if (vb->servers == NULL) {
+        vbucket_config_destroy(vb);
+        errstr = "Failed to allocate servers array";
+        return -1;
+    }
     for (i = 0; i < vb->num_servers; ++i) {
         char *server;
         cJSON *jServer = cJSON_GetArrayItem(c, i);
@@ -144,42 +161,57 @@ static int populate_servers(struct vbucket_config_st *vb, cJSON *c) {
     return 0;
 }
 
-static int lookup_server_struct(struct vbucket_config_st *vb, cJSON *c) {
-    char *authority = NULL, *hostname = NULL, *colon = NULL;
-    int port = -1, idx = -1, ii;
+static int get_node_authority(cJSON *node, char *buf, size_t nbuf) {
+    cJSON *json;
+    char *hostname = NULL, *colon = NULL;
+    int port = -1;
 
-    cJSON *obj = cJSON_GetObjectItem(c, "hostname");
-    if (obj == NULL || obj->type != cJSON_String) {
+    json = cJSON_GetObjectItem(node, "hostname");
+    if (json == NULL || json->type != cJSON_String) {
         errstr = "Expected string for node's hostname";
         return -1;
     }
-    hostname = obj->valuestring;
-    obj = cJSON_GetObjectItem(c, "ports");
-    if (obj == NULL || obj->type != cJSON_Object) {
-        errstr = "Expected object for node's ports";
+    hostname = json->valuestring;
+    json = cJSON_GetObjectItem(node, "ports");
+    if (json == NULL || json->type != cJSON_Object) {
+        errstr = "Expected json object for node's ports";
         return -1;
     }
-    obj = cJSON_GetObjectItem(obj, "direct");
-    if (obj == NULL || obj->type != cJSON_Number) {
+    json = cJSON_GetObjectItem(json, "direct");
+    if (json == NULL || json->type != cJSON_Number) {
         errstr = "Expected number for node's direct port";
         return -1;
     }
-    port = obj->valueint;
-    authority = calloc(strlen(hostname) + 6, sizeof(char)); /* hostname+port */
+    port = json->valueint;
+
+    snprintf(buf, nbuf - 7, "%s", hostname);
+    colon = strchr(buf, ':');
+    if (!colon) {
+        colon = buf + strlen(buf);
+    }
+    snprintf(colon, 7, ":%d", port);
+
+    return 0;
+}
+
+static int lookup_server_struct(struct vbucket_config_st *vb, cJSON *c) {
+    char *authority = NULL;
+    int idx = -1, ii;
+
+    authority = calloc(MAX_AUTORITY_SIZE, sizeof(char));
     if (authority == NULL) {
         errstr = "Failed to allocate storage for authority string";
         return -1;
     }
-    sprintf(authority, "%s", hostname);
-    colon = strchr(authority, ':');
-    if (!colon) {
-        colon = authority + strlen(authority);
+    if (get_node_authority(c, authority, MAX_AUTORITY_SIZE) < 0) {
+        free(authority);
+        return -1;
     }
-    sprintf(colon, ":%d", port);
 
     for (ii = 0; ii < vb->num_servers; ++ii) {
         if (strcmp(vb->servers[ii].authority, authority) == 0) {
             idx = ii;
+            break;
         }
     }
 
@@ -187,21 +219,22 @@ static int lookup_server_struct(struct vbucket_config_st *vb, cJSON *c) {
     return idx;
 }
 
-static int populate_node_info(struct vbucket_config_st *vb, cJSON *c) {
+static int update_server_info(struct vbucket_config_st *vb, cJSON *config) {
     int idx, ii;
+    cJSON *node, *json;
 
-    for (ii = 0; ii < cJSON_GetArraySize(c); ++ii) {
-        cJSON *jNode = cJSON_GetArrayItem(c, ii);
-        if (jNode) {
-            if (jNode->type != cJSON_Object) {
-                errstr = "Expected object for nodes array item";
+    for (ii = 0; ii < cJSON_GetArraySize(config); ++ii) {
+        node = cJSON_GetArrayItem(config, ii);
+        if (node) {
+            if (node->type != cJSON_Object) {
+                errstr = "Expected json object for nodes array item";
                 return -1;
             }
 
-            if ((idx = lookup_server_struct(vb, jNode)) >= 0) {
-                cJSON *obj = cJSON_GetObjectItem(jNode, "couchApiBase");
-                if (obj != NULL) {
-                    char *value = strdup(obj->valuestring);
+            if ((idx = lookup_server_struct(vb, node)) >= 0) {
+                json = cJSON_GetObjectItem(node, "couchApiBase");
+                if (json != NULL) {
+                    char *value = strdup(json->valuestring);
                     if (value == NULL) {
                         errstr = "Failed to allocate storage for couchApiBase string";
                         return -1;
@@ -214,19 +247,22 @@ static int populate_node_info(struct vbucket_config_st *vb, cJSON *c) {
     return 0;
 }
 
-static int populate_buckets(struct vbucket_config_st *vb, cJSON *c, int is_ft)
+static int populate_buckets(struct vbucket_config_st *vb, cJSON *c, int is_forward)
 {
     int i, j;
-    struct vbucket_st *vbucket_map = NULL;
+    struct vbucket_st *vb_map = NULL;
 
-    if (is_ft) {
-        if (!(vb->fvbuckets = malloc(vb->num_vbuckets * sizeof(struct vbucket_st)))) {
+    if (is_forward) {
+        if (!(vb->fvbuckets = vb_map = calloc(vb->num_vbuckets, sizeof(struct vbucket_st)))) {
             errstr = "Failed to allocate storage for forward vbucket map";
             return -1;
         }
+    } else {
+        if (!(vb->vbuckets = vb_map = calloc(vb->num_vbuckets, sizeof(struct vbucket_st)))) {
+            errstr = "Failed to allocate storage for vbucket map";
+            return -1;
+        }
     }
-
-    vbucket_map = (is_ft ? vb->fvbuckets : vb->vbuckets);
 
     for (i = 0; i < vb->num_vbuckets; ++i) {
         cJSON *jBucket = cJSON_GetArrayItem(c, i);
@@ -242,128 +278,173 @@ static int populate_buckets(struct vbucket_config_st *vb, cJSON *c, int is_ft)
                 errstr = "Server ID must be >= -1 and < num_servers";
                 return -1;
             }
-            vbucket_map[i].servers[j] = jServerId->valueint;
+            vb_map[i].servers[j] = jServerId->valueint;
         }
     }
     return 0;
 }
 
-static char *get_char_val(cJSON *c, const char *key) {
-    cJSON *obj = cJSON_GetObjectItem(c, key);
-    return (obj != NULL && obj->type == cJSON_String) ? obj->valuestring : NULL;
-}
-
-static VBUCKET_CONFIG_HANDLE parse_cjson(cJSON *c)
+static VBUCKET_CONFIG_HANDLE parse_vbucket_config(VBUCKET_CONFIG_HANDLE vb, cJSON *c)
 {
-    char *user;
-    char *password;
-    cJSON *body;
-    cJSON *jHashAlgorithm;
-    char *hashAlgorithm;
-    cJSON *jNumReplicas;
-    int numReplicas;
-    cJSON *jServers;
-    int numServers;
-    cJSON *jBuckets;
-    cJSON *jBucketsForward;
-    int numBuckets;
-    struct vbucket_config_st *vb;
+    cJSON *json, *config;
 
-    user = get_char_val(c, "name");
-    password = get_char_val(c, "saslPassword");
-
-    body = cJSON_GetObjectItem(c, "vBucketServerMap");
-    if (body != NULL) {
-        VBUCKET_CONFIG_HANDLE ret = parse_cjson(body); // Allows clients to have a JSON envelope.
-        if (ret != NULL) {
-            cJSON *jNodes;
-            set_username(ret, user);
-            set_password(ret, password);
-
-            jNodes = cJSON_GetObjectItem(c, "nodes");
-            if (jNodes) {
-                if (jNodes->type != cJSON_Array) {
-                    errstr = "Expected array for nodes";
-                    return NULL;
-                }
-                if (populate_node_info(ret, jNodes) != 0) {
-                    vbucket_config_destroy(ret);
-                    return NULL;
-                }
-            }
-        }
-        return ret;
+    config = cJSON_GetObjectItem(c, "vBucketServerMap");
+    if (config == NULL || config->type != cJSON_Object) {
+        /* seems like config without envelop, try to parse it */
+        config = c;
     }
 
-
-    jHashAlgorithm = cJSON_GetObjectItem(c, "hashAlgorithm");
-    if (jHashAlgorithm == NULL || jHashAlgorithm->type != cJSON_String) {
-        errstr = "Expected string for hashAlgorithm";
-        return NULL;
-    }
-    hashAlgorithm = jHashAlgorithm->valuestring;
-
-    jNumReplicas = cJSON_GetObjectItem(c, "numReplicas");
-    if (jNumReplicas == NULL || jNumReplicas->type != cJSON_Number ||
-        jNumReplicas->valueint > MAX_REPLICAS) {
+    json = cJSON_GetObjectItem(config, "numReplicas");
+    if (json == NULL || json->type != cJSON_Number ||
+        json->valueint > MAX_REPLICAS) {
         errstr = "Expected number <= " STRINGIFY(MAX_REPLICAS) " for numReplicas";
         return NULL;
     }
-    numReplicas = jNumReplicas->valueint;
+    vb->num_replicas = json->valueint;
 
-    jServers = cJSON_GetObjectItem(c, "serverList");
-    if (jServers == NULL || jServers->type != cJSON_Array) {
+    json = cJSON_GetObjectItem(config, "serverList");
+    if (json == NULL || json->type != cJSON_Array) {
         errstr = "Expected array for serverList";
         return NULL;
     }
-
-    numServers = cJSON_GetArraySize(jServers);
-    if (numServers == 0) {
+    vb->num_servers = cJSON_GetArraySize(json);
+    if (vb->num_servers == 0) {
         errstr = "Empty serverList";
         return NULL;
     }
+    if (populate_servers(vb, json) != 0) {
+        return NULL;
+    }
+    /* optionally update server info using envelop (couchdb_api_base etc.) */
+    json = cJSON_GetObjectItem(c, "nodes");
+    if (json) {
+        if (json->type != cJSON_Array) {
+            errstr = "Expected array for nodes";
+            return NULL;
+        }
+        if (update_server_info(vb, json) != 0) {
+            return NULL;
+        }
+    }
 
-    jBuckets = cJSON_GetObjectItem(c, "vBucketMap");
-    if (jBuckets == NULL || jBuckets->type != cJSON_Array) {
+    json = cJSON_GetObjectItem(config, "vBucketMap");
+    if (json == NULL || json->type != cJSON_Array) {
         errstr = "Expected array for vBucketMap";
         return NULL;
     }
-
-    /* this could possibly be null */
-    jBucketsForward = cJSON_GetObjectItem(c, "vBucketMapForward");
-    if (jBuckets && jBuckets->type != cJSON_Array) {
-        errstr = "Expected array for vBucketMap";
-        return NULL;
-    }
-
-
-    numBuckets = cJSON_GetArraySize(jBuckets);
-    if (numBuckets == 0 || (numBuckets & (numBuckets - 1)) != 0) {
+    vb->num_vbuckets = cJSON_GetArraySize(json);
+    if (vb->num_vbuckets == 0 || (vb->num_vbuckets & (vb->num_vbuckets - 1)) != 0) {
         errstr = "Number of buckets must be a power of two > 0 and <= " STRINGIFY(MAX_BUCKETS);
         return NULL;
     }
+    vb->mask = vb->num_vbuckets - 1;
+    if (populate_buckets(vb, json, 0) != 0) {
+        return NULL;
+    }
 
-    vb = config_create(hashAlgorithm, numServers, numBuckets, numReplicas,
-                       user, password);
+    /* vbucket forward map could possibly be null */
+    json = cJSON_GetObjectItem(config, "vBucketMapForward");
+    if (json) {
+        if (json->type != cJSON_Array) {
+            errstr = "Expected array for vBucketMapForward";
+            return NULL;
+        }
+        if (populate_buckets(vb, json, 1) !=0) {
+            return NULL;
+        }
+    }
+
+    return vb;
+}
+
+static VBUCKET_CONFIG_HANDLE parse_ketama_config(VBUCKET_CONFIG_HANDLE vb, cJSON *config)
+{
+    cJSON *json, *node;
+    char *buf;
+    int ii;
+
+    json = cJSON_GetObjectItem(config, "nodes");
+    if (json == NULL || json->type != cJSON_Array) {
+        errstr = "Expected array for nodes";
+        return NULL;
+    }
+
+    vb->num_servers = cJSON_GetArraySize(json);
+    if (vb->num_servers == 0) {
+        errstr = "Empty serverList";
+        return NULL;
+    }
+    vb->servers = calloc(vb->num_servers, sizeof(struct server_st));
+    for (ii = 0; ii < vb->num_servers; ++ii) {
+        node = cJSON_GetArrayItem(json, ii);
+        if (node == NULL || node->type != cJSON_Object) {
+            errstr = "Expected object for nodes array item";
+            return NULL;
+        }
+        buf = calloc(MAX_AUTORITY_SIZE, sizeof(char));
+        if (buf == NULL) {
+            errstr = "Failed to allocate storage for node authority";
+            return NULL;
+        }
+        if (get_node_authority(node, buf, MAX_AUTORITY_SIZE) < 0) {
+            return NULL;
+        }
+        vb->servers[ii].authority = buf;
+    }
+
+    update_ketama_continuum(vb);
+    return vb;
+}
+
+static VBUCKET_CONFIG_HANDLE parse_cjson(cJSON *config)
+{
+    cJSON *json;
+    struct vbucket_config_st *vb;
+
+    vb = calloc(1, sizeof(struct vbucket_config_st));
     if (vb == NULL) {
+        errstr = "Failed to allocate vbucket config struct";
         return NULL;
     }
 
-    if (populate_servers(vb, jServers) != 0) {
-        vbucket_config_destroy(vb);
-        return NULL;
+    /* set optional credentials */
+    json = cJSON_GetObjectItem(config, "name");
+    if (json != NULL && json->type == cJSON_String && strcmp(json->valuestring, "default") != 0) {
+        vb->user = strdup(json->valuestring);
+    }
+    json = cJSON_GetObjectItem(config, "saslPassword");
+    if (json != NULL && json->type == cJSON_String) {
+        vb->password = strdup(json->valuestring);
     }
 
-    if (populate_buckets(vb, jBuckets, 0) != 0) {
-        vbucket_config_destroy(vb);
-        return NULL;
-    }
+    /* by default it uses vbucket distribution to map keys to servers */
+    vb->distribution = VBUCKET_DISTRIBUTION_VBUCKET;
 
-    if (jBucketsForward) {
-        if (populate_buckets(vb, jBucketsForward, 1) !=0) {
+    json = cJSON_GetObjectItem(config, "nodeLocator");
+    if (json == NULL) {
+        /* special case: it migth be config without envelope */
+        if (parse_vbucket_config(vb, config) == NULL) {
             vbucket_config_destroy(vb);
             return NULL;
         }
+    } else if (json->type == cJSON_String) {
+        if (strcmp(json->valuestring, "vbucket") == 0) {
+            vb->distribution = VBUCKET_DISTRIBUTION_VBUCKET;
+            if (parse_vbucket_config(vb, config) == NULL) {
+                vbucket_config_destroy(vb);
+                return NULL;
+            }
+        } else if (strcmp(json->valuestring, "ketama") == 0) {
+            vb->distribution = VBUCKET_DISTRIBUTION_KETAMA;
+            if (parse_ketama_config(vb, config) == NULL) {
+                vbucket_config_destroy(vb);
+                return NULL;
+            }
+        }
+    } else {
+        errstr = "Expected string for nodeLocator";
+        vbucket_config_destroy(vb);
+        return NULL;
     }
 
     return vb;
@@ -372,8 +453,8 @@ static VBUCKET_CONFIG_HANDLE parse_cjson(cJSON *c)
 VBUCKET_CONFIG_HANDLE vbucket_config_parse_string(const char *data) {
     VBUCKET_CONFIG_HANDLE vb;
     cJSON *c = cJSON_Parse(data);
-    errstr = "Failed to parse data";
     if (c == NULL) {
+        errstr = "Failed to parse data";
         return NULL;
     }
 
@@ -403,7 +484,7 @@ VBUCKET_CONFIG_HANDLE vbucket_config_parse_file(const char *filename)
         errstr = "File too large";
         return NULL;
     }
-    data = calloc(sizeof(char), size+1);
+    data = calloc(size+1, sizeof(char));
     if (data == NULL) {
         errstr = "Unable to allocate buffer to read file";
         return NULL;
@@ -420,6 +501,63 @@ VBUCKET_CONFIG_HANDLE vbucket_config_parse_file(const char *filename)
     return h;
 }
 
+int vbucket_map(VBUCKET_CONFIG_HANDLE vb, const void *key, size_t nkey,
+                int *vbucket_id, int *server_idx)
+{
+    uint32_t digest, mid, prev;
+    struct continuum_item_st *beginp, *endp, *midp, *highp, *lowp;
+
+    if (vb->distribution == VBUCKET_DISTRIBUTION_KETAMA) {
+        assert(vb->continuum);
+        if (vbucket_id) {
+            *vbucket_id = 0;
+        }
+        digest = hash_ketama(key, nkey);
+        beginp = lowp = vb->continuum;
+        endp = highp = vb->continuum + vb->num_continuum;
+
+        /* divide and conquer array search to find server with next biggest
+         * point after what this key hashes to */
+        while (1)
+        {
+            /* pick the middle point */
+            midp = lowp + (highp - lowp) / 2;
+
+            if (midp == endp) {
+                /* if at the end, roll back to zeroth */
+                *server_idx = beginp->index;
+                break;
+            }
+
+            mid = midp->point;
+            prev = (midp == beginp) ? 0 : (midp-1)->point;
+
+            if (digest <= mid && digest > prev) {
+                /* we found nearest server */
+                *server_idx = midp->index;
+                break;
+            }
+
+            /* adjust the limits */
+            if (mid < digest) {
+                lowp = midp + 1;
+            } else {
+                highp = midp - 1;
+            }
+
+            if (lowp > highp) {
+                *server_idx = beginp->index;
+                break;
+            }
+        }
+    } else {
+        *vbucket_id = vbucket_get_vbucket_by_key(vb, key, nkey);
+        *server_idx = vbucket_get_master(vb, *vbucket_id);
+    }
+    return 0;
+}
+
+
 int vbucket_config_get_num_replicas(VBUCKET_CONFIG_HANDLE vb) {
     return vb->num_replicas;
 }
@@ -434,6 +572,10 @@ int vbucket_config_get_num_servers(VBUCKET_CONFIG_HANDLE vb) {
 
 const char *vbucket_config_get_couch_api_base(VBUCKET_CONFIG_HANDLE vb, int i) {
     return vb->servers[i].couchdb_api_base;
+}
+
+VBUCKET_DISTRIBUTION_TYPE vbucket_config_get_distribution_type(VBUCKET_CONFIG_HANDLE vb) {
+    return vb->distribution;
 }
 
 const char *vbucket_config_get_server(VBUCKET_CONFIG_HANDLE vb, int i) {

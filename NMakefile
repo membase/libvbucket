@@ -20,11 +20,14 @@ TARGETOS=WINNT
 INSTALL=c:\local
 INSTALLDIRS=$(INSTALL) $(INSTALL)\include $(INSTALL)\include\libvbucket $(INSTALL)\lib $(INSTALL)\bin
 
-libvbucket.dll: src\cJSON.obj src\vbucket.obj src\crc32.obj
-	$(link) $(dlllflags) -out:libvbucket.dll -version:1.0 src\cJSON.obj src\vbucket.obj src\crc32.obj
+libvbucket.dll: src\cJSON.obj src\vbucket.obj src\crc32.obj src\hash.obj
+	$(link) $(dlllflags) -out:libvbucket.dll -version:1.0 src\cJSON.obj src\vbucket.obj src\crc32.obj src\ketama.obj
 
 src\crc32.obj: src\crc32.c
 	$(cc) $(cdebug) $(cflags) $(cvarsdll) -D_CRT_SECURE_NO_WARNINGS -Fosrc\crc32.obj -Iwin32 -Iinclude -DLIBISASL_INTERNAL src\crc32.c
+
+src\ketama.obj: src\ketama.c
+	$(cc) $(cdebug) $(cflags) $(cvarsdll) -D_CRT_SECURE_NO_WARNINGS -Fosrc\ketama.obj -Iwin32 -Iinclude -DLIBISASL_INTERNAL src\ketama.c
 
 src\cJSON.obj: src\cJSON.c
 	$(cc) $(cdebug) $(cflags) $(cvarsdll) -D_CRT_SECURE_NO_WARNINGS -Fosrc\cJSON.obj -Iwin32 -Iinclude -DLIBISASL_INTERNAL src\cJSON.c
@@ -42,5 +45,5 @@ install: $(INSTALLDIRS) libvbucket.dll
 $(INSTALL) $(INSTALL)\include $(INSTALL)\include\libvbucket $(INSTALL)\lib $(INSTALL)\bin:; -@mkdir $@
 
 clean:
-	-del libvbucket.dll libvbucket.exp libvbucket.lib src\cJSON.obj src\vbucket.obj src\crc32.obj vc100.pdb
+	-del libvbucket.dll libvbucket.exp libvbucket.lib src\cJSON.obj src\vbucket.obj src\crc32.obj src\ketama.obj vc100.pdb
 

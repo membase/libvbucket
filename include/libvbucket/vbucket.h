@@ -56,6 +56,15 @@ extern "C" {
     typedef struct vbucket_config_st* VBUCKET_CONFIG_HANDLE;
 
     /**
+     * Type of distribution used to map keys to servers. It is possible to
+     * select algorithm using "locator" key in config.
+     */
+    typedef enum {
+        VBUCKET_DISTRIBUTION_VBUCKET = 0,
+        VBUCKET_DISTRIBUTION_KETAMA = 1,
+    } VBUCKET_DISTRIBUTION_TYPE;
+
+    /**
      * \addtogroup cfgcmp
      * @{
      */
@@ -207,6 +216,16 @@ extern "C" {
      */
     LIBVBUCKET_PUBLIC_API
     const char *vbucket_config_get_couch_api_base(VBUCKET_CONFIG_HANDLE vb, int i);
+
+    /**
+     * Get the distribution type. Currently can be or "vbucket" (for
+     * eventually persisted nodes) either "ketama" (for plain memcached
+     * nodes).
+     *
+     * @return a member of VBUCKET_DISTRIBUTION_TYPE enum.
+     */
+    LIBVBUCKET_PUBLIC_API
+    VBUCKET_DISTRIBUTION_TYPE vbucket_config_get_distribution_type(VBUCKET_CONFIG_HANDLE vb);
     /**
      * @}
      */
@@ -215,6 +234,24 @@ extern "C" {
      * \addtogroup vb
      * @{
      */
+
+
+    /**
+     * Map given key to server index. It is aware about current distribution
+     * type.
+     *
+     * @param h the vbucket config
+     * @param key pointer to the beginning of the key
+     * @param nkey the size of the key
+     * @param vbucket_id the vbucket identifier when vbucket distribution is
+     *                   used or zero otherwise.
+     * @param server_idx the server index
+     *
+     * @return zero on success
+     */
+    LIBVBUCKET_PUBLIC_API
+    int vbucket_map(VBUCKET_CONFIG_HANDLE h, const void *key, size_t nkey,
+                    int *vbucket_id, int *server_idx);
 
     /**
      * Get the vbucket number for the given key.
