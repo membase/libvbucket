@@ -21,6 +21,10 @@
 #include <libvbucket/vbucket.h>
 
 int main(int argc, char **argv) {
+    VBUCKET_CONFIG_HANDLE vb = NULL;
+    int num_replicas;
+    int i;
+
     if (argc < 3) {
         printf("vbuckettool mapfile key0 [key1 ... [keyN]]\n\n");
         printf("  The vbuckettool expects a vBucketServerMap JSON mapfile, and\n");
@@ -32,8 +36,6 @@ int main(int argc, char **argv) {
         printf("       ./vbuckettool - some_key another_key\n");
         exit(1);
     }
-
-    VBUCKET_CONFIG_HANDLE vb = NULL;
 
     if (strcmp("-", argv[1]) == 0) {
         char buf[500000];
@@ -53,9 +55,9 @@ int main(int argc, char **argv) {
         exit(1);
     }
 
-    int num_replicas = vbucket_config_get_num_replicas(vb);
+    num_replicas = vbucket_config_get_num_replicas(vb);
 
-    for (int i = 2; i < argc; i++) {
+    for (i = 2; i < argc; i++) {
         char *key = argv[i];
         int v, m;
         const char *master, *couch_api_base;
@@ -70,14 +72,17 @@ int main(int argc, char **argv) {
         if (vbucket_config_get_distribution_type(vb) == VBUCKET_DISTRIBUTION_VBUCKET) {
             printf(" vBucketId: %d couchApiBase: %s", v, couch_api_base);
             if (num_replicas > 0) {
+                int j;
                 printf(" replicas:");
-                for (int j = 0; j < num_replicas; j++) {
+                for (j = 0; j < num_replicas; j++) {
                     int r = vbucket_get_replica(vb, v, j);
+                    const char *replica;
+
                     if (r == -1) {
                         break;
                     }
 
-                    const char *replica = vbucket_config_get_server(vb, r);
+                    replica = vbucket_config_get_server(vb, r);
                     if (replica != NULL) {
                         printf(" %s", replica);
                     }

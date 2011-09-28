@@ -1,5 +1,5 @@
 /* -*- Mode: C; tab-width: 4; c-basic-offset: 4; indent-tabs-mode: nil -*- */
-
+#include <stdlib.h>
 #include "hash.h"
 
 /* Force md5 functions to be static. The compiler could show warnings but
