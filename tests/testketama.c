@@ -16,9 +16,13 @@
 
 static void read_checksum(const char *path, unsigned char *result) {
     FILE *ff = fopen(path, "r");
-    int ii;
+    int ii, nn;
     for (ii = 0; ii < 16; ++ii) {
-        fscanf(ff, "%2x", (unsigned int *)&result[ii]);
+        nn = fscanf(ff, "%2x", (unsigned int *)&result[ii]);
+        if (nn != 1) {
+            perror("scanf");
+            abort();
+        }
     }
 }
 
