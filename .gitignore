@@ -10,6 +10,7 @@
 *~
 .deps/
 .libs/
+.pc
 /INSTALL
 /Makefile
 /Makefile.in
@@ -33,6 +34,10 @@
 /configure
 /docs/doxy
 /libtool
+/libvbucket*.changes
+/libvbucket*.deb
+/libvbucket*.dsc
+/libvbucket*.tar.gz
 /libvbucket.dll
 /libvbucket.exp
 /libvbucket.lib

@@ -1,0 +1,5 @@
+libvbucket (1.7.2) unstable; urgency=low
+
+  * Initial release
+
+ -- Sergey Avseyev <sergey@couchbase.com>  Thu, 01 Dec 2011 23:56:12 +0300

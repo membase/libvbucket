@@ -126,3 +126,4 @@ vbucketkeygen_LDADD= libvbucket.la
 
 test: check-TESTS
 
+sinclude packaging/*/package.mk
