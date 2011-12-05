@@ -68,6 +68,18 @@ AC_SEARCH_LIBS(floor, m)
 AC_SEARCH_LIBS(pow, m)
 AC_SEARCH_LIBS(fabs, m)
 
+#
+# To ensure that we don't break applications in mysterious ways we need
+# to version our library. For a detailed description, check out:
+# http://www.gnu.org/software/libtool/manual/libtool.html#Libtool-versioning
+#
+LIBVBUCKET_API_CURRENT=1
+LIBVBUCKET_API_REVISION=0
+LIBVBUCKET_API_AGE=0
+AC_SUBST(LIBVBUCKET_API_CURRENT)
+AC_SUBST(LIBVBUCKET_API_REVISION)
+AC_SUBST(LIBVBUCKET_API_AGE)
+
 dnl ----------------------------------------------------------------------------
 
 AC_CONFIG_FILES(Makefile libvbucket.pc)

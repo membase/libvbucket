@@ -109,10 +109,7 @@ libvbucket_la_SOURCES= \
 # to version our library. For a detailed description, check out:
 # http://www.gnu.org/software/libtool/manual/libtool.html#Libtool-versioning
 #
-current=1
-revision=0
-age=0
-libvbucket_la_LDFLAGS= -version-info $(current):$(revision):$(age) -no-undefined
+libvbucket_la_LDFLAGS= -version-info $(LIBVBUCKET_API_CURRENT):$(LIBVBUCKET_API_REVISION):$(LIBVBUCKET_API_AGE) -no-undefined
 libvbucket_la_LIBADD = libketama.la
 libvbucket_la_DEPENDENCIES = libketama.la
 
