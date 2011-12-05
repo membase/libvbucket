@@ -1,0 +1,6 @@
+PKG=libvbucket
+NAME=libvbucket - library used to map vbuckets to servers
+BASEDIR=/
+CLASSES=none
+CATEGORY=system
+EMAIL=support@couchbase.com
