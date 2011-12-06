@@ -1,0 +1,69 @@
+%define _topdir %(pwd)/rpmbuild
+
+Summary: vbucket library for memcached
+Name: libvbucket
+Version: @VERSION@
+Release: @RELEASE@
+Vendor: Couchbase, Inc.
+Packager: Couchbase SDK Team <support@couchbase.com>
+License: Apache-2
+Group: System Environment/Libraries
+URL: https://github.com/membase/libvbucket
+Source: %{name}-%{version}_%{release}.tar.gz
+BuildRoot: build/%{name}-%{version}_%{release}
+
+%description
+libvbucket is a library providing vbucket distribution layer for memcached
+clients.
+
+%package -n %{name}1
+Group: System Environment/Libraries
+Summary: vbucket library for memcached
+
+%description -n %{name}1
+libvbucket is a library providing vbucket distribution layer for memcached
+clients.
+
+%package devel
+Group: Development/Libraries
+Summary: vbucket library for memcached - Header files
+Requires: %{name}1
+
+%description devel
+Development files for the vbucket library for memcached.
+
+%prep
+%setup -q -n %{name}-%{version}_%{release}
+%configure
+
+%build
+%{__make} %{_smp_mflags}
+
+%install
+%{__make} install DESTDIR="%{buildroot}" AM_INSTALL_PROGRAM_FLAGS=""
+
+%clean
+%{__rm} -rf %{buildroot}
+
+%post -n %{name}1 -p /sbin/ldconfig
+
+%postun -n %{name}1 -p /sbin/ldconfig
+
+%files -n %{name}1
+%defattr(-, root, root)
+%{_libdir}/libvbucket.so.*
+
+%files devel
+%defattr(-, root, root)
+%doc README.markdown LICENSE
+%{_bindir}/vbucketkeygen
+%{_bindir}/vbuckettool
+%{_includedir}/libvbucket
+%{_libdir}/libvbucket.la
+%{_libdir}/libvbucket.so
+%{_libdir}/pkgconfig/libvbucket.pc
+%{_mandir}/**/*
+
+%changelog
+* Mon Dec 05 2011 Sergey Avseyev <sergey.avseyev@gmail.com> - 1.7.2
+- Initial packaging

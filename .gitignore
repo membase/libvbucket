@@ -37,6 +37,7 @@
 /libvbucket*.changes
 /libvbucket*.deb
 /libvbucket*.dsc
+/libvbucket*.rpm
 /libvbucket*.tar.gz
 /libvbucket.dll
 /libvbucket.exp
