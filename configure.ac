@@ -1,56 +1,42 @@
 # libvbucket
-# Copyright (C) 2010 NorthScale, Inc
+# Copyright (C) 2010, 2011 Couchbase, Inc
 # All rights reserved.
 #
-# Use and distribution licensed under the BSD license.  See
-# the COPYING file in this directory for full text.
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+#
 AC_PREREQ(2.59)
 m4_include([m4/version.m4])
-AC_INIT(libvbucket, VERSION_NUMBER, trond@northscale.com)
+AC_INIT(libvbucket, VERSION_NUMBER, support@couchbase.com)
 AC_CONFIG_SRCDIR([src/vbucket.c])
 AC_CONFIG_AUX_DIR(config)
+AC_USE_SYSTEM_EXTENSIONS
+AM_INIT_AUTOMAKE
+AC_PROG_CC
+AM_PROG_CC_C_O
+AC_DISABLE_STATIC
+AC_PROG_LIBTOOL
 AM_CONFIG_HEADER([config.h])
 AC_CONFIG_MACRO_DIR([m4])
-AC_DISABLE_STATIC
 
 # the malloc tests seems to be broken for cross compilation.. ignore them
 ac_cv_func_malloc_0_nonnull=yes
 ac_cv_func_realloc_0_nonnull=yes
 
+COUCHBASE_GENERIC_COMPILER(c89)
 
-PANDORA_CANONICAL_TARGET(less-warnings, warnings-always-on, force-gcc42)
-
-AH_TOP([
-#ifndef CONFIG_H
-#define CONFIG_H
-/*
- * Copyright (C) 2010 NorthScale, Inc
- * All rights reserved.
- *
- * Use and distribution licensed under the BSD license.  See
- * the COPYING file in this directory for full text.
- */
-#ifdef _SYS_FEATURE_TESTS_H
-#error "You should include config.h as your first include file"
-#endif
-])
-
-if test "x${enable_dependency_tracking}" = "x"
-then
-  enable_dependency_tracking=yes
-fi
-
-AM_CPPFLAGS="$AM_CPPFLAGS -I\${top_srcdir}/include"
-
-AS_IF([test "x$SUNCC" = "xyes"],
-      [
-        CFLAGS="-D_XOPEN_SOURCE=600 $CFLAGS"
-        CPPFLAGS="-xldscope=hidden -mt $CPPFLAGS"
-      ])
-
-AH_BOTTOM([
-#endif
-])
+AC_SEARCH_LIBS(floor, m)
+AC_SEARCH_LIBS(pow, m)
+AC_SEARCH_LIBS(fabs, m)
 
 AC_ARG_WITH([docs],
   [AS_HELP_STRING([--with-docs],
@@ -58,15 +44,10 @@ AC_ARG_WITH([docs],
   [with_docs=$withval],
   [with_docs=yes])
 
-AS_IF([test "$with_docs" = "yes"],
-  [
-    REQUIRE_POD2MAN
-  ])
+AC_PATH_PROG(POD2MAN, pod2man, missing)
+AS_IF([test "$with_docs" = "yes" -a "$POD2MAN" = "missing" ],
+      [ AC_MSG_ERROR([pod2man is required for building docs])])
 AM_CONDITIONAL(BUILD_DOCS, test "$with_docs" = "yes")
-
-AC_SEARCH_LIBS(floor, m)
-AC_SEARCH_LIBS(pow, m)
-AC_SEARCH_LIBS(fabs, m)
 
 #
 # To ensure that we don't break applications in mysterious ways we need
@@ -79,25 +60,10 @@ LIBVBUCKET_API_AGE=0
 AC_SUBST(LIBVBUCKET_API_CURRENT)
 AC_SUBST(LIBVBUCKET_API_REVISION)
 AC_SUBST(LIBVBUCKET_API_AGE)
-
 dnl ----------------------------------------------------------------------------
 
 AC_CONFIG_FILES(Makefile libvbucket.pc)
 AC_OUTPUT
-echo "---"
-echo "Configuration summary for $PACKAGE_NAME version $VERSION"
-echo ""
-echo "   * Installation prefix:       $prefix"
-echo "   * System type:               $host_vendor-$host_os"
-echo "   * Host CPU:                  $host_cpu"
-echo "   * C Compiler:                $CC_VERSION"
-echo "   * C++ Compiler:              $CXX_VERSION"
-echo "   * Assertions enabled:        $ac_cv_assert"
-echo "   * Debug enabled:             $with_debug"
-echo "   * Warnings as failure:       $ac_cv_warnings_as_errors"
-echo ""
-echo "---"
-
 AS_IF(test "$with_docs" = "no",
   [
     echo "*****"
