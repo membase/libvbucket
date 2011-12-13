@@ -134,15 +134,15 @@ static const struct vb_st vbuckets[] =
 };
 
 static void testConfig(const char *c) {
+    int whoops = 0;
+    const struct key_st *k;
+    int i = 0;
     VBUCKET_CONFIG_HANDLE vb = vbucket_config_parse_string(c);
     if (vb == NULL) {
         fprintf(stderr, "vbucket_config_parse_string error: %s\n", vbucket_get_error());
         abort();
     }
 
-    int whoops = 0;
-    const struct key_st *k;
-    int i = 0;
     while ((k = &keys[i++])->key != NULL) {
         int id = vbucket_get_vbucket_by_key(vb, k->key, strlen(k->key));
         if (id != k->vbucket) {
@@ -268,12 +268,12 @@ static void testConfigDiff(void) {
         "}";
 
     VBUCKET_CONFIG_HANDLE vb1 = vbucket_config_parse_string(cfg1);
-    assert(vb1);
-
     VBUCKET_CONFIG_HANDLE vb2 = vbucket_config_parse_string(cfg2);
+    VBUCKET_CONFIG_DIFF *diff;
     assert(vb2);
 
-    VBUCKET_CONFIG_DIFF *diff = vbucket_compare(vb1, vb2);
+    diff = vbucket_compare(vb1, vb2);
+    assert(vb1);
     assert(diff);
 
     assert(diff->sequence_changed);
@@ -301,12 +301,11 @@ static void testConfigDiff(void) {
 
 static void testConfigDiffSame(void) {
     VBUCKET_CONFIG_HANDLE vb1 = vbucket_config_parse_string(config);
-    assert(vb1);
-
     VBUCKET_CONFIG_HANDLE vb2 = vbucket_config_parse_string(config);
+    VBUCKET_CONFIG_DIFF *diff;
+    assert(vb1);
     assert(vb2);
-
-    VBUCKET_CONFIG_DIFF *diff = vbucket_compare(vb1, vb2);
+    diff = vbucket_compare(vb1, vb2);
     assert(diff);
 
     assert(diff->sequence_changed == 0);
@@ -350,17 +349,22 @@ static void testConfigUserPassword(void) {
         "    ]\n"
         "}";
 
-    VBUCKET_CONFIG_HANDLE vb1 = vbucket_config_parse_string(cfg1);
+    VBUCKET_CONFIG_HANDLE vb1;
+    VBUCKET_CONFIG_HANDLE vb2;
+    VBUCKET_CONFIG_DIFF *diff;
+
+
+    vb1 = vbucket_config_parse_string(cfg1);
     assert(vb1);
     assert(strcmp(vbucket_config_get_user(vb1), "theUser") == 0);
     assert(strcmp(vbucket_config_get_password(vb1), "thePassword") == 0);
 
-    VBUCKET_CONFIG_HANDLE vb2 = vbucket_config_parse_string(cfg2);
+    vb2 = vbucket_config_parse_string(cfg2);
     assert(vb2);
     assert(strcmp(vbucket_config_get_user(vb2), "theUserIsDifferent") == 0);
     assert(strcmp(vbucket_config_get_password(vb2), "thePasswordIsDifferent") == 0);
 
-    VBUCKET_CONFIG_DIFF *diff = vbucket_compare(vb1, vb2);
+    diff = vbucket_compare(vb1, vb2);
     assert(diff);
 
     assert(diff->sequence_changed);

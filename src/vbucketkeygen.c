@@ -23,6 +23,15 @@
 size_t MAX_KEY_SIZE = 14;
 
 int main(int argc, char **argv) {
+    VBUCKET_CONFIG_HANDLE vb = NULL;
+    int rval;
+    int num_keys_per_vbucket;
+    int num_keys_to_generate;
+    int num_vbuckets;
+    char *** keys;
+    int i, j, v, k, total;
+    char *key;
+
     if (argc < 4) {
         printf("vbucketkeygen mapfile <keys per vbucket> <keys to generate>\n\n");
         printf("  vbucketkeygen will output a list of keys that equally\n");
@@ -37,7 +46,6 @@ int main(int argc, char **argv) {
         exit(1);
     }
 
-    VBUCKET_CONFIG_HANDLE vb = NULL;
 
     if (strcmp("-", argv[1]) == 0) {
         char buf[50000];
@@ -57,29 +65,28 @@ int main(int argc, char **argv) {
         exit(1);
     }
 
-    int rval = 0;
-    int num_keys_per_vbucket = atoi(argv[2]);
-    int num_keys_to_generate = atoi(argv[3]);
-    int num_vbuckets = vbucket_config_get_num_vbuckets(vb);
-    char *** keys;
+    rval = 0;
+    num_keys_per_vbucket = atoi(argv[2]);
+    num_keys_to_generate = atoi(argv[3]);
+    num_vbuckets = vbucket_config_get_num_vbuckets(vb);
 
     /* allocate memory and set each key to null since strdup will allocate that */
     keys = malloc(sizeof(char***) * num_vbuckets);
-    for (int i = 0; i < num_vbuckets; i++) {
+    for (i = 0; i < num_vbuckets; i++) {
         keys[i] = malloc(sizeof(char**) * num_keys_per_vbucket);
     }
-    for (int i = 0; i < num_vbuckets; i++) {
-        for (int j = 0 ; j < num_keys_per_vbucket ; j++) {
+    for (i = 0; i < num_vbuckets; i++) {
+        for (j = 0 ; j < num_keys_per_vbucket ; j++) {
             keys[i][j] = 0;
         }
     }
 
     /* generate keys and copy them to the keys structure */
-    char * key = malloc(sizeof(char) * (MAX_KEY_SIZE+1));
-    for (int i = 0; i < num_keys_to_generate; i++) {
+    key = malloc(sizeof(char) * (MAX_KEY_SIZE+1));
+    for (i = 0; i < num_keys_to_generate; i++) {
         snprintf(key, MAX_KEY_SIZE + 1, "key_%010d", i);
-        int v = vbucket_get_vbucket_by_key(vb, key, strlen(key));
-        for (int k = 0; k < num_keys_per_vbucket; k++) {
+        v = vbucket_get_vbucket_by_key(vb, key, strlen(key));
+        for (k = 0; k < num_keys_per_vbucket; k++) {
             if (keys[v][k] == 0) {
                 keys[v][k] = strdup(key);
                 break;
@@ -90,9 +97,9 @@ int main(int argc, char **argv) {
     /* print out <key> <vbucket> and count up total keys
        so we can check that every vbucket has the correct
        number of keys */
-    int total = 0;
-    for (int i = 0; i < num_vbuckets; i++) {
-        for (int j = 0 ; j < num_keys_per_vbucket ; j++) {
+    total = 0;
+    for (i = 0; i < num_vbuckets; i++) {
+        for (j = 0 ; j < num_keys_per_vbucket ; j++) {
             if (keys[i][j] != 0) {
                 printf("%s %d\n", keys[i][j], i);
                 total++;

@@ -635,7 +635,7 @@ static void compute_vb_list_diff(VBUCKET_CONFIG_HANDLE from,
     int offset = 0;
     int i, j;
     for (i = 0; i < to->num_servers; i++) {
-        bool found = false;
+        int found = 0;
         const char *sn = vbucket_config_get_server(to, i);
         for (j = 0; !found && j < from->num_servers; j++) {
             const char *sn2 = vbucket_config_get_server(from, j);
@@ -665,7 +665,6 @@ VBUCKET_CONFIG_DIFF* vbucket_compare(VBUCKET_CONFIG_HANDLE from,
     /* Verify the servers are equal in their positions */
     if (to->num_servers == from->num_servers) {
         int i;
-        rv->sequence_changed = false;
         for (i = 0; i < from->num_servers; i++) {
             rv->sequence_changed |= (0 != strcmp(vbucket_config_get_server(from, i),
                                                  vbucket_config_get_server(to, i)));
@@ -673,7 +672,7 @@ VBUCKET_CONFIG_DIFF* vbucket_compare(VBUCKET_CONFIG_HANDLE from,
         }
     } else {
         /* Just say yes */
-        rv->sequence_changed = true;
+        rv->sequence_changed = 1;
     }
 
     /* Consider the sequence changed if the auth credentials changed */

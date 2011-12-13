@@ -41,7 +41,6 @@
 #define LIBVBUCKET_VBUCKET_H 1
 
 #include <stddef.h>
-#include <stdbool.h>
 #include "visibility.h"
 
 #ifdef __cplusplus
@@ -61,7 +60,7 @@ extern "C" {
      */
     typedef enum {
         VBUCKET_DISTRIBUTION_VBUCKET = 0,
-        VBUCKET_DISTRIBUTION_KETAMA = 1,
+        VBUCKET_DISTRIBUTION_KETAMA = 1
     } VBUCKET_DISTRIBUTION_TYPE;
 
     /**
@@ -86,9 +85,9 @@ extern "C" {
          */
         int n_vb_changes;
         /**
-         * True if the sequence of servers changed.
+         * non-null if the sequence of servers changed.
          */
-        bool sequence_changed;
+        int sequence_changed;
     } VBUCKET_CONFIG_DIFF;
 
     /**
