@@ -469,6 +469,7 @@ int main(void) {
   testConfigDiffSame();
   testConfigUserPassword();
   testConfigCouchApiBase();
+  return 0;
 }
 
 
