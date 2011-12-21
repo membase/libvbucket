@@ -183,18 +183,18 @@ static void testWrongServer(const char *c) {
         abort();
     }
 
-    // Starts at 0
+    /* Starts at 0 */
     assert(vbucket_get_master(vb, 0) == 0);
-    // Does not change when I told it I found the wrong thing
+    /* Does not change when I told it I found the wrong thing */
     assert(vbucket_found_incorrect_master(vb, 0, 1) == 0);
     assert(vbucket_get_master(vb, 0) == 0);
-    // Does change if I tell it I got the right thing and it was wrong.
+    /* Does change if I tell it I got the right thing and it was wrong. */
     assert(vbucket_found_incorrect_master(vb, 0, 0) == 1);
     assert(vbucket_get_master(vb, 0) == 1);
-    // ...and again
+    /* ...and again */
     assert(vbucket_found_incorrect_master(vb, 0, 1) == 2);
     assert(vbucket_get_master(vb, 0) == 2);
-    // ...and then wraps
+    /* ...and then wraps */
     assert(vbucket_found_incorrect_master(vb, 0, 2) == 0);
     assert(vbucket_get_master(vb, 0) == 0);
 
@@ -213,15 +213,15 @@ static void testWrongServerFFT(const char *c) {
         abort();
     }
 
-    // found incorrect master should not be the same as get master now
+    /* found incorrect master should not be the same as get master now */
     nvb = vbucket_config_get_num_vbuckets(vb);
     for (i = 0; i < nvb; i++) {
         rv = vbucket_get_master(vb, i);
         assert(rv != vbucket_found_incorrect_master(vb, i, rv));
     }
-    // the ideal test case should be that we check that the vbucket
-    // and the fvbucket map are identical at this point. TODO untill
-    // we have a vbucketlib function that diffs vbuckets and fvbuckets
+    /* the ideal test case should be that we check that the vbucket */
+    /* and the fvbucket map are identical at this point. TODO untill */
+    /* we have a vbucketlib function that diffs vbuckets and fvbuckets */
     vbucket_config_destroy(vb);
 }
 
