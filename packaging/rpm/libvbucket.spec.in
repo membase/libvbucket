@@ -1,6 +1,6 @@
 %define _topdir %(pwd)/rpmbuild
 
-Summary: vbucket library for memcached
+Summary: vbucket library for Couchbase
 Name: libvbucket
 Version: @VERSION@
 Release: @RELEASE@
@@ -8,29 +8,29 @@ Vendor: Couchbase, Inc.
 Packager: Couchbase SDK Team <support@couchbase.com>
 License: Apache-2
 Group: System Environment/Libraries
-URL: https://github.com/membase/libvbucket
+URL: http://www.couchbase.com
 Source: %{name}-%{version}_%{release}.tar.gz
 BuildRoot: build/%{name}-%{version}_%{release}
 
 %description
-libvbucket is a library providing vbucket distribution layer for memcached
+libvbucket is a library providing vbucket distribution layer for Couchbase
 clients.
 
 %package -n %{name}1
 Group: System Environment/Libraries
-Summary: vbucket library for memcached
+Summary: vbucket library for Couchbase
 
 %description -n %{name}1
-libvbucket is a library providing vbucket distribution layer for memcached
+libvbucket is a library providing vbucket distribution layer for Couchbase
 clients.
 
 %package devel
 Group: Development/Libraries
-Summary: vbucket library for memcached - Header files
+Summary: vbucket library for Couchbase - Header files
 Requires: %{name}1
 
 %description devel
-Development files for the vbucket library for memcached.
+Development files for the vbucket library for Couchbase.
 
 %prep
 %setup -q -n %{name}-%{version}_%{release}
