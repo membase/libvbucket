@@ -37,12 +37,12 @@ AC_DEFUN([COUCHBASE_GENERIC_COMPILER], [
   GCC_C_DEBUG="-g"
   GCC_CXX_DEBUG="-g"
   GCC_VISIBILITY=-fvisibility=hidden
-  GCC_CPPFLAGS="-pthread -pipe -D_THREAD_SAFE -D_GNU_SOURCE"
+  GCC_CPPFLAGS="-pipe -D_THREAD_SAFE -D_GNU_SOURCE"
   GCC_CFLAGS="-std=gnu99"
   GCC_CXXFLAGS=""
   GCC_C89=-std=c89
   GCC_C99=-std=gnu99
-  GCC_LDFLAGS="-lpthread"
+  GCC_LDFLAGS=""
   GCC_CPP_WARNINGS="-Wall -pedantic -Wundef -Wshadow -fdiagnostics-show-option -Wformat -fno-strict-aliasing -Wno-strict-aliasing -Wextra"
   GCC_C_COMPILER_WARNINGS="-Wstrict-prototypes -Wmissing-prototypes -Wredundant-decls -Wmissing-declarations -Wcast-align"
   GCC_CXX_COMPILER_WARNINGS="-std=gnu++98 -Woverloaded-virtual -Wnon-virtual-dtor -Wctor-dtor-privacy -Wno-long-long -Wno-redundant-decls"
