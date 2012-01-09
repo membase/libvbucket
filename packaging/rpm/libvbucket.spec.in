@@ -10,7 +10,7 @@ License: Apache-2
 Group: System Environment/Libraries
 URL: http://www.couchbase.com
 Source: %{name}-%{version}_%{release}.tar.gz
-BuildRoot: build/%{name}-%{version}_%{release}
+BuildRoot: %{_topdir}/build/%{name}-%{version}_%{release}
 
 %description
 libvbucket is a library providing vbucket distribution layer for Couchbase
