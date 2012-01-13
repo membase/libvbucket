@@ -91,17 +91,20 @@ check_PROGRAMS= testapp regression testketama
 TESTS = ${check_PROGRAMS}
 
 # Test application to test stuff from C
-testapp_SOURCES = tests/testapp.c
+testapp_SOURCES = tests/testapp.c tests/macros.h
 testapp_DEPENDENCIES= libvbucket.la
 testapp_LDADD= libvbucket.la
 
-regression_SOURCES = tests/regression.c
+regression_SOURCES = tests/regression.c tests/macros.h
 regression_DEPENDENCIES= libvbucket.la
 regression_LDADD= libvbucket.la
 
-testketama_SOURCES = tests/testketama.c
+testketama_SOURCES = tests/testketama.c tests/macros.h
 testketama_DEPENDENCIES= libvbucket.la libketama.la
 testketama_LDADD= libvbucket.la libketama.la
+
+# Configuration files needed by check target
+EXTRA_DIST += tests/config
 
 libketama_la_SOURCES = src/ketama.c
 libketama_la_CFLAGS =  $(AM_CFLAGS) ${NO_WERROR}

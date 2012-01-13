@@ -1,5 +1,4 @@
 #undef NDEBUG
-#include <assert.h>
 #include <dirent.h>
 #include <limits.h>
 #include <errno.h>
@@ -9,6 +8,8 @@
 
 #include <libvbucket/vbucket.h>
 
+#include "macros.h"
+
 int main(void) {
    char *root = getenv("srcdir");
    if (root != NULL) {
@@ -16,7 +17,7 @@ int main(void) {
       DIR *dp;
       struct dirent *de;
 
-      sprintf(buffer, "%s/tests/regression", root);
+      sprintf(buffer, "%s/tests/config", root);
       dp = opendir(buffer);
       if (dp == NULL) {
          fprintf(stderr, "Skipping regression check\nFailed to open %s: %s\n",
@@ -25,9 +26,9 @@ int main(void) {
       }
 
       while ((de = readdir(dp)) != NULL) {
-         if (strncmp(de->d_name, "bug", 3) == 0 || strncmp(de->d_name, "mb-", 3) == 0) {
+         if (strncmp(de->d_name, "regression-bug", 14) == 0 || strncmp(de->d_name, "mb-", 3) == 0) {
             VBUCKET_CONFIG_HANDLE h;
-            sprintf(buffer, "%s/tests/regression/%s", root, de->d_name);
+            sprintf(buffer, "%s/tests/config/%s", root, de->d_name);
             fprintf(stderr, "Running regression test for: %s\n", de->d_name);
             h = vbucket_config_parse_file(buffer);
             assert(h != NULL);
