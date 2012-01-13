@@ -1,0 +1,25 @@
+{
+  "otherKeyThatIsIgnored": 12345,
+  "vBucketServerMap": {
+    "hashAlgorithm": "CRC",
+    "numReplicas": 2,
+    "serverList": [
+      "server1:11211",
+      "server2:11210",
+      "server3:11211",
+      "server4:11211"
+    ],
+    "vBucketMap": [
+      [ 0, 1, 2 ],
+      [ 1, 2, 0 ],
+      [ 2, 1, -1 ],
+      [ 1, 2, 0 ]
+    ],
+    "vBucketMapForward": [
+      [ 3, 0, 0 ],
+      [ 2, 1, 3 ],
+      [ 1, 2, 2 ],
+      [ 0, 3, 1 ]
+    ]
+  }
+}
