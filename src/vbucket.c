@@ -37,6 +37,7 @@
 
 struct server_st {
     char *authority;        /* host:port */
+    char *rest_api_authority;
     char *couchdb_api_base;
 };
 
@@ -240,6 +241,15 @@ static int update_server_info(struct vbucket_config_st *vb, cJSON *config) {
                         return -1;
                     }
                     vb->servers[idx].couchdb_api_base = value;
+                }
+                json = cJSON_GetObjectItem(node, "hostname");
+                if (json != NULL) {
+                    char *value = strdup(json->valuestring);
+                    if (value == NULL) {
+                        errstr = "Failed to allocate storage for hostname string";
+                        return -1;
+                    }
+                    vb->servers[idx].rest_api_authority = value;
                 }
             }
         }
@@ -572,6 +582,10 @@ int vbucket_config_get_num_servers(VBUCKET_CONFIG_HANDLE vb) {
 
 const char *vbucket_config_get_couch_api_base(VBUCKET_CONFIG_HANDLE vb, int i) {
     return vb->servers[i].couchdb_api_base;
+}
+
+const char *vbucket_config_get_rest_api_server(VBUCKET_CONFIG_HANDLE vb, int i) {
+    return vb->servers[i].rest_api_authority;
 }
 
 VBUCKET_DISTRIBUTION_TYPE vbucket_config_get_distribution_type(VBUCKET_CONFIG_HANDLE vb) {

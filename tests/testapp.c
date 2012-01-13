@@ -394,7 +394,7 @@ static void testConfigCouchApiBase(void)
         "{                                                             "
         "  \"nodes\": [                                                "
         "    {                                                         "
-        "      \"hostname\": \"192.168.2.123:9000\",                   "
+        "      \"hostname\": \"192.168.2.123:9002\",                   "
         "      \"couchApiBase\": \"http://192.168.2.123:9502/default\","
         "      \"ports\": {                                            "
         "        \"proxy\": 12005,                                     "
@@ -410,7 +410,7 @@ static void testConfigCouchApiBase(void)
         "      }                                                       "
         "    },                                                        "
         "    {                                                         "
-        "      \"hostname\": \"192.168.2.123:9000\",                   "
+        "      \"hostname\": \"192.168.2.123:9001\",                   "
         "      \"couchApiBase\": \"http://192.168.2.123:9501/default\","
         "      \"ports\": {                                            "
         "        \"proxy\": 12003,                                     "
@@ -452,6 +452,9 @@ static void testConfigCouchApiBase(void)
     assert(strcmp(vbucket_config_get_couch_api_base(vb, 0), "http://192.168.2.123:9500/default") == 0);
     assert(strcmp(vbucket_config_get_couch_api_base(vb, 1), "http://192.168.2.123:9501/default") == 0);
     assert(strcmp(vbucket_config_get_couch_api_base(vb, 2), "http://192.168.2.123:9502/default") == 0);
+    assert(strcmp(vbucket_config_get_rest_api_server(vb, 0), "192.168.2.123:9000") == 0);
+    assert(strcmp(vbucket_config_get_rest_api_server(vb, 1), "192.168.2.123:9001") == 0);
+    assert(strcmp(vbucket_config_get_rest_api_server(vb, 2), "192.168.2.123:9002") == 0);
     assert(strcmp(vbucket_config_get_server(vb, 0), "192.168.2.123:12000") == 0);
     assert(strcmp(vbucket_config_get_server(vb, 1), "192.168.2.123:12002") == 0);
     assert(strcmp(vbucket_config_get_server(vb, 2), "192.168.2.123:12004") == 0);

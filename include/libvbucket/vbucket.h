@@ -217,6 +217,14 @@ extern "C" {
     const char *vbucket_config_get_couch_api_base(VBUCKET_CONFIG_HANDLE vb, int i);
 
     /**
+     * Get the REST API endpoint at the given index.
+     *
+     * @return a string or NULL.
+     */
+    LIBVBUCKET_PUBLIC_API
+    const char *vbucket_config_get_rest_api_server(VBUCKET_CONFIG_HANDLE vb, int i);
+
+    /**
      * Get the distribution type. Currently can be or "vbucket" (for
      * eventually persisted nodes) either "ketama" (for plain memcached
      * nodes).
