@@ -1,6 +1,7 @@
 /* -*- Mode: C; tab-width: 4; c-basic-offset: 4; indent-tabs-mode: nil -*- */
 
 #undef NDEBUG
+#include <assert.h>
 #include <dirent.h>
 #include <limits.h>
 #include <errno.h>
@@ -10,7 +11,6 @@
 
 #include <libvbucket/vbucket.h>
 #include "src/hash.h"
-#include "tests/macros.h"
 
 #define NKEY 10
 

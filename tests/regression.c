@@ -1,4 +1,5 @@
 #undef NDEBUG
+#include <assert.h>
 #include <dirent.h>
 #include <limits.h>
 #include <errno.h>
@@ -7,8 +8,6 @@
 #include <string.h>
 
 #include <libvbucket/vbucket.h>
-
-#include "tests/macros.h"
 
 int main(void) {
    char *root = getenv("srcdir");
