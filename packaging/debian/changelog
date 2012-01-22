@@ -1,3 +1,11 @@
+libvbucket (1.8.0.1) stable; urgency=low
+
+  * Unbundled release from Couchbase Server 1.8.0.  This release allows
+    for libvbucket to be installed in common locations.  There have been
+    minor changes to support portability to c89 based systems.
+
+ -- Sergey Avseyev <sergey@couchbase.com>  Sun, 22 Jan 2012 12:47:23 -0800
+
 libvbucket (1.7.2) unstable; urgency=low
 
   * Initial release

@@ -65,5 +65,9 @@ Development files for the vbucket library for Couchbase.
 %{_mandir}/**/*
 
 %changelog
+* Sun Jan 22 2012 Sergey Avseyev <sergey.avseyev@gmail.com> - 1.8.0.1
+- Unbundled release from Couchbase Server 1.8.0.  This release allows
+  for libvbucket to be installed in common locations.  There have been
+  minor changes to support portability to c89 based systems.
 * Mon Dec 05 2011 Sergey Avseyev <sergey.avseyev@gmail.com> - 1.7.2
 - Initial packaging
