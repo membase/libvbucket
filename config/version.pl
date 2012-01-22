@@ -4,7 +4,7 @@
 use warnings;
 use strict;
 
-my $version = `git describe --long`;
+my $version = `git describe`;
 chomp $version;
 # Test the various versions.
 #my $version = 'foob';
