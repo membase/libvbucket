@@ -370,6 +370,12 @@ static int parse_vbucket_config(VBUCKET_CONFIG_HANDLE vb, cJSON *c)
     return 0;
 }
 
+static int server_cmp(const void *s1, const void *s2)
+{
+    return strcmp(((const struct server_st *)s1)->authority,
+                  ((const struct server_st *)s2)->authority);
+}
+
 static int parse_ketama_config(VBUCKET_CONFIG_HANDLE vb, cJSON *config)
 {
     cJSON *json, *node;
@@ -404,6 +410,7 @@ static int parse_ketama_config(VBUCKET_CONFIG_HANDLE vb, cJSON *config)
         }
         vb->servers[ii].authority = buf;
     }
+    qsort(vb->servers, vb->num_servers, sizeof(struct server_st), server_cmp);
 
     update_ketama_continuum(vb);
     return 0;

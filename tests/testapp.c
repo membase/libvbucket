@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <limits.h>
+#include <sys/stat.h>
 
 #include <libvbucket/vbucket.h>
 
@@ -44,8 +45,16 @@ static const struct vb_st vbuckets[] =
 static char *configPath(const char *fname) {
     static char buffer[PATH_MAX];
     char *root = getenv("srcdir");
+    struct stat st;
 
     sprintf(buffer, "%s/tests/config/testapp-%s", root, fname);
+    if (stat(buffer, &st) == -1) {
+        sprintf(buffer, "%s/tests/config/%s", root, fname);
+        if (stat(buffer, &st) == -1) {
+            fprintf(stderr, "cannot find config %s\n", fname);
+            abort();
+        }
+    }
     return buffer;
 }
 
@@ -193,6 +202,25 @@ static void testConfigDiffSame(void) {
     vbucket_config_destroy(vb2);
 }
 
+static void testConfigDiffKetamaSame(void) {
+    VBUCKET_CONFIG_HANDLE vb1 = vbucket_config_parse_file(configPath("ketama-eight-nodes"));
+    VBUCKET_CONFIG_HANDLE vb2 = vbucket_config_parse_file(configPath("ketama-ordered-eight-nodes"));
+    VBUCKET_CONFIG_DIFF *diff;
+    assert(vb1);
+    assert(vb2);
+    diff = vbucket_compare(vb1, vb2);
+    assert(diff);
+
+    assert(diff->sequence_changed == 0);
+    assert(diff->n_vb_changes == 0);
+    assert(diff->servers_added[0] == NULL);
+    assert(diff->servers_removed[0] == NULL);
+
+    vbucket_free_diff(diff);
+    vbucket_config_destroy(vb1);
+    vbucket_config_destroy(vb2);
+}
+
 static void testConfigUserPassword(void) {
     VBUCKET_CONFIG_HANDLE vb1;
     VBUCKET_CONFIG_HANDLE vb2;
@@ -259,5 +287,6 @@ int main(void) {
   testConfigDiffSame();
   testConfigUserPassword();
   testConfigCouchApiBase();
+  testConfigDiffKetamaSame();
   return 0;
 }
