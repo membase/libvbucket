@@ -378,7 +378,7 @@ static int server_cmp(const void *s1, const void *s2)
 
 static int parse_ketama_config(VBUCKET_CONFIG_HANDLE vb, cJSON *config)
 {
-    cJSON *json, *node;
+    cJSON *json, *node, *hostname;
     char *buf;
     int ii;
 
@@ -409,6 +409,17 @@ static int parse_ketama_config(VBUCKET_CONFIG_HANDLE vb, cJSON *config)
             return -1;
         }
         vb->servers[ii].authority = buf;
+        hostname = cJSON_GetObjectItem(node, "hostname");
+        if (hostname == NULL || hostname->type != cJSON_String) {
+            vb->errmsg = strdup("Expected string for node's hostname");
+            return -1;
+        }
+        buf = strdup(hostname->valuestring);
+        if (buf == NULL) {
+            vb->errmsg = strdup("Failed to allocate storage for hostname string");
+            return -1;
+        }
+        vb->servers[ii].rest_api_authority = buf;
     }
     qsort(vb->servers, vb->num_servers, sizeof(struct server_st), server_cmp);
 
