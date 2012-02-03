@@ -100,6 +100,36 @@ extern "C" {
      */
 
     /**
+     * Create a new vbucket config handle
+     * @return handle or NULL if there is no more memory
+     */
+    LIBVBUCKET_PUBLIC_API
+    VBUCKET_CONFIG_HANDLE vbucket_config_create(void);
+
+    typedef enum {
+        LIBVBUCKET_SOURCE_FILE,
+        LIBVBUCKET_SOURCE_MEMORY
+    } vbucket_source_t;
+
+    /**
+     * Parse a vbucket configuration
+     * @param handle the vbucket config handle to store the result
+     * @param data_source what kind of datasource to parse
+     * @param data A zero terminated string representing the data to parse.
+     *             For LIBVBUCKET_SOURCE_FILE this is the file to parse,
+     *             for LIBVBUCKET_SOURCE_MEMORY it is the actual JSON body.
+     * @return 0 for success, the appropriate error code otherwise
+     */
+    LIBVBUCKET_PUBLIC_API
+    int vbucket_config_parse(VBUCKET_CONFIG_HANDLE handle,
+                             vbucket_source_t data_source,
+                             const char *data);
+
+    LIBVBUCKET_PUBLIC_API
+    const char *vbucket_get_error_message(VBUCKET_CONFIG_HANDLE handle);
+
+
+    /**
      * Create an instance of vbucket config from a file.
      *
      * @param filename the vbucket config to parse

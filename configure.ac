@@ -54,9 +54,9 @@ AM_CONDITIONAL(BUILD_DOCS, test "$with_docs" = "yes")
 # to version our library. For a detailed description, check out:
 # http://www.gnu.org/software/libtool/manual/libtool.html#Libtool-versioning
 #
-LIBVBUCKET_API_CURRENT=1
+LIBVBUCKET_API_CURRENT=2
 LIBVBUCKET_API_REVISION=0
-LIBVBUCKET_API_AGE=0
+LIBVBUCKET_API_AGE=1
 AC_SUBST(LIBVBUCKET_API_CURRENT)
 AC_SUBST(LIBVBUCKET_API_REVISION)
 AC_SUBST(LIBVBUCKET_API_AGE)
