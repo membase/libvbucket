@@ -3,7 +3,10 @@
  */
 #ifndef INTTYPES_H
 #define INTTYPES_H
-
-#include <stdint.h>
+#ifndef HAVE_STDINT_h
+# include "win_stdint.h"
+#else
+# include <stdint.h>
+#endif
 
 #endif

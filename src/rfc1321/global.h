@@ -10,7 +10,11 @@
 #define PROTOTYPES 0
 #endif
 
-#include <stdint.h>
+#ifndef HAVE_STDINT_h
+# include "win_stdint.h"
+#else
+# include <stdint.h>
+#endif
 
 /* POINTER defines a generic pointer type */
 typedef unsigned char *POINTER;
