@@ -18,7 +18,14 @@
 #ifndef LIBVBUCKET_HASH_H
 #define LIBVBUCKET_HASH_H 1
 
+#include "config.h"
+
+#ifndef HAVE_STDINT_H
+#include "win_stdint.h"
+#else
 #include <stdint.h>
+#endif
+
 #include <sys/types.h>
 #include <stdio.h>
 

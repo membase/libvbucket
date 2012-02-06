@@ -49,6 +49,10 @@ AS_IF([test "$with_docs" = "yes" -a "$POD2MAN" = "missing" ],
       [ AC_MSG_ERROR([pod2man is required for building docs])])
 AM_CONDITIONAL(BUILD_DOCS, test "$with_docs" = "yes")
 
+AC_CHECK_HEADERS_ONCE([stdint.h])
+AS_IF([test "x$ac_cv_header_stdint_h" != "xyes"],
+      [AC_MSG_ERROR(Failed to locate stdint.h)])
+
 #
 # To ensure that we don't break applications in mysterious ways we need
 # to version our library. For a detailed description, check out:
