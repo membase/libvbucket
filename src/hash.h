@@ -18,7 +18,7 @@
 #ifndef LIBVBUCKET_HASH_H
 #define LIBVBUCKET_HASH_H 1
 
-#ifndef HAVE_STDINT_h
+#ifndef HAVE_STDINT_H
 # include "win_stdint.h"
 #else
 # include <stdint.h>

@@ -10,7 +10,7 @@
 #define PROTOTYPES 0
 #endif
 
-#ifndef HAVE_STDINT_h
+#ifndef HAVE_STDINT_H
 # include "win_stdint.h"
 #else
 # include <stdint.h>
