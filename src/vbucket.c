@@ -128,12 +128,15 @@ void vbucket_config_destroy(VBUCKET_CONFIG_HANDLE vb) {
     int i;
     for (i = 0; i < vb->num_servers; ++i) {
         free(vb->servers[i].authority);
+        free(vb->servers[i].rest_api_authority);
         free(vb->servers[i].couchdb_api_base);
     }
     free(vb->servers);
     free(vb->user);
     free(vb->password);
     free(vb->fvbuckets);
+    free(vb->vbuckets);
+    free(vb->continuum);
     free(vb->errmsg);
     memset(vb, 0xff, sizeof(vb));
     free(vb);
