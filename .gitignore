@@ -4,8 +4,12 @@
 *.4
 *.[ao]
 *.dirstamp
+*.dll
+*.dobj
 *.exe
+*.exp
 *.l[ao]
+*.lib
 *.obj
 *~
 .deps/
@@ -39,9 +43,6 @@
 /libvbucket*.dsc
 /libvbucket*.rpm
 /libvbucket*.tar.gz
-/libvbucket.dll
-/libvbucket.exp
-/libvbucket.lib
 /libvbucket.pc
 /m4/libtool.m4
 /m4/ltoptions.m4
@@ -56,3 +57,4 @@
 /vbucketkeygen
 /vbuckettool
 /vc100.pdb
+/vc100.idb

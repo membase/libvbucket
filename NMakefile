@@ -1,5 +1,5 @@
-# libsasl
-# Copyright (C) 2011 Couchbase, Inc
+# libvbucket
+# Copyright (C) 2010 - 1012 Couchbase, Inc
 # All rights reserved.
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,54 +14,113 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-TARGETOS=WINNT
-!include <win32.mak>
+CC_NODEBUG = cl.exe /O2 /DNDEBUG /MD /LD
+CC_DEBUG = cl.exe /Od /D_DEBUG /RTC1 /Z7 /LDd /W3 /MDd
+CFLAGS = /Iinclude /Iwin32 /nologo /W3 /EHsc /DWIN32 /FD /c -D_CRT_SECURE_NO_WARNINGS -DBUILDING_LIBVBUCKET=1
+LDFLAGS = /nologo /dll /incremental:no /opt:ref,icf /version:1.0
+LD = link.exe
+RM = del
 
-INSTALL=c:\local
-INSTALLDIRS=$(INSTALL) $(INSTALL)\include $(INSTALL)\include\libvbucket $(INSTALL)\lib $(INSTALL)\bin
-
-LIBVBUCKET_OBJS=src\cJSON.obj \
-     src\vbucket.obj \
-     src\crc32.obj \
-     src\ketama.obj
-
-INCPATH=-Iwin32 -Iinclude
-DLLCOMPILE=$(cc) $(cdebug) $(cflags) $(cvarsdll) $(INCPATH) -D_CRT_SECURE_NO_WARNINGS -DBUILDING_LIBVBUCKET=1
-COMPILE=$(cc) $(cdebug) $(cflags) $(INCPATH) -D_CRT_SECURE_NO_WARNINGS
+libvbucket_SOURCES= src\crc32.c src\cJSON.c src\vbucket.c src/ketama.c
+vbucketkeygen_SOURCES = src\vbucketkeygen.c
+testketama_SOURCES = tests\testketama.c
+regression_SOURCES = tests\regression.c
+testapp_SOURCES = tests\testapp.c
+vbuckettool_SOURCES=src\vbuckettool.c
 
 
-libvbucket.dll: $(LIBVBUCKET_OBJS)
-	$(link) $(dlllflags) -out:libvbucket.dll -version:1.0 $(LIBVBUCKET_OBJS)
+# Unfortunately nmake is a bit limited in its substitute functions.
+# Work around that by using dobj to represent debug object files ;)
+libvbucket_la_OBJECTS=$(libvbucket_SOURCES:.c=.obj)
+libvbucket_la_debug_OBJECTS=$(libvbucket_SOURCES:.c=.dobj)
 
-src\crc32.obj: src\crc32.c
-	$(DLLCOMPILE) -Fosrc\crc32.obj src\crc32.c
+vbucketkeygen_OBJECTS=$(vbuckettool_SOURCES:.c=.obj)
+testketama_OBJECTS=$(testketama_SOURCES:.c=.obj)
+regression_OBJECTS=$(regression_SOURCES:.c=.obj)
+testapp_OBJECTS=$(testapp_SOURCES:.c=.obj)
+vbuckettool_OBJECTS=$(vbuckettool_SOURCES:.c=.obj)
 
-src\cJSON.obj: src\cJSON.c src\cJSON.h
-	$(DLLCOMPILE) -Fosrc\cJSON.obj src\cJSON.c
+all_OBJS=$(vbucketkeygen_OBJECTS) $(testketama_OBJECTS) \
+         $(testketama_OBJECTS) $(regression_OBJECTS) \
+         $(testapp_OBJECTS) $(vbuckettool_OBJECTS) \
+         $(libvbucket_la_OBJECTS) $(libvbucket_la_debug_OBJECTS)
 
-src\ketama.obj: src\ketama.c
-	$(DLLCOMPILE) -Fosrc\ketama.obj src\ketama.c
+check_PROGRAMS = testapp.exe regression.exe testketama.exe
+bin_PROGRAMS = vbuckettool.exe vbucketkeygen.exe
 
-src\vbucket.obj: src\vbucket.c src\cJSON.h
-	$(DLLCOMPILE) -Fosrc\vbucket.obj src\vbucket.c
+all: libvbucket_debug.dll \
+     libvbucket.dll \
+     $(bin_PROGRAMS)
 
-src\vbuckettool.obj: src\vbuckettool.c include\libvbucket\vbucket.h
-	$(COMPILE)  -Fosrc/vbuckettool.obj src/vbuckettool.c
+check: $(check_PROGRAMS)
+    @echo "Todo: port the tests and run them"
 
-vbuckettool.exe: src\vbuckettool.obj libvbucket.dll
-	$(link) -out:vbuckettool.exe src\vbuckettool.obj  libvbucket.lib
+libvbucket.dll: $(libvbucket_la_OBJECTS)
+	$(LD) $(LDFLAGS) /out:libvbucket.dll $(libvbucket_la_OBJECTS)
 
-install: $(INSTALLDIRS) libvbucket.dll vbuckettool.exe
-	@copy include\libvbucket\vbucket.h $(INSTALL)\include\libvbucket
-	@copy include\libvbucket\visibility.h $(INSTALL)\include\libvbucket
-	@copy libvbucket.dll $(INSTALL)\lib
-	@copy libvbucket.dll $(INSTALL)\bin
-	@copy libvbucket.exp $(INSTALL)\lib
-	@copy libvbucket.lib $(INSTALL)\lib
-	@copy vbuckettool.exe $(INSTALL)\bin
+libvbucket_debug.dll: $(libvbucket_la_debug_OBJECTS)
+	$(LD) $(LDFLAGS) /out:libvbucket_debug.dll $(libvbucket_la_debug_OBJECTS)
 
-$(INSTALL) $(INSTALL)\include $(INSTALL)\include\libvbucket $(INSTALL)\lib $(INSTALL)\bin:; -@mkdir $@
+vbucketkeygen.exe: $(vbucketkeygen_OBJECTS) libvbucket.dll
+	$(LD) -out:vbucketkeygen.exe $(vbucketkeygen_OBJECTS)  libvbucket.lib
+
+testketama.exe: $(testketama_OBJECTS) libvbucket_debug.dll
+	$(LD) -out:testketama.exe $(testketama_OBJECTS) libvbucket_debug.lib
+
+regression.exe: $(regression_OBJECTS) libvbucket_debug.dll
+	$(LD) -out:regression.exe $(regression_OBJECTS) libvbucket_debug.lib
+
+testapp.exe: $(testapp_OBJECTS) libvbucket_debug.dll
+	$(LD) -out:testapp.exe $(testapp_OBJECTS) libvbucket_debug.lib
+
+vbuckettool.exe: $(vbuckettool_OBJECTS) libvbucket.dll
+	$(LD) -out:vbuckettool.exe $(vbuckettool_OBJECTS)  libvbucket.lib
+
+.SUFFIXES: .c .obj .dobj .res
+
+.c.dobj:
+	$(CC_DEBUG) $(CFLAGS) /Fo"$@"  $<
+
+.c.obj:
+	$(CC_NODEBUG) $(CFLAGS) /Fo"$@"  $<
 
 clean:
-	-del libvbucket.dll libvbucket.exp libvbucket.lib vc100.pdb $(LIBVBUCKET_OBJS) vbuckettool.exe src\vbuckettool.obj
+	-del $(all_OBJECTS) \
+		 libvbucket.dll libvbucket.exp libvbucket.lib \
+		 libvbucket_debug.dll libvbucket_debug.exp libvbucket_debug.lib \
+		 vc100.idb vc100.pdb \
+         $(bin_PROGRAMS) $(check_PROGRAMS)
 
+INSTALL=..\deps
+INSTALLDIRS=$(INSTALL) $(INSTALL)\include $(INSTALL)\include\libvbucket $(INSTALL)\lib $(INSTALL)\bin
+
+install: $(INSTALLDIRS) libvbucket.dll libvbucket_debug.dll $(bin_PROGRAMS)
+	copy include\libvbucket\** $(INSTALL)\include\libvbucket
+	copy libvbucket.dll $(INSTALL)\lib
+	copy libvbucket.dll $(INSTALL)\bin
+	copy libvbucket.exp $(INSTALL)\lib
+	copy libvbucket.lib $(INSTALL)\lib
+	copy libvbucket_debug.dll $(INSTALL)\lib
+	copy libvbucket_debug.dll $(INSTALL)\bin
+	copy libvbucket_debug.exp $(INSTALL)\lib
+	copy libvbucket_debug.lib $(INSTALL)\lib
+    copy vbucketkeygen.exe $(INSTALL)\bin
+    copy vbuckettool.exe $(INSTALL)\bin
+
+
+uninstall:
+	-del $(INSTALL)\lib\libvbucket_debug.dll \
+         $(INSTALL)\bin\libvbucket_debug.dll \
+         $(INSTALL)\lib\libvbucket_debug.exp \
+         $(INSTALL)\lib\libvbucket_debug.lib \
+         $(INSTALL)\lib\libvbucket.dll \
+         $(INSTALL)\bin\libvbucket.dll \
+         $(INSTALL)\lib\libvbucket.exp \
+         $(INSTALL)\lib\libvbucket.lib \
+         $(INSTALL)\include\libvbucket\vbucket.h \
+         $(INSTALL)\include\libvbucket\visibility.h \
+         $(INSTALL)\bin\vbucketkeygen.exe \
+         $(INSTALL)\bin\vbuckettool.exe
+	-rmdir $(INSTALL)\lib $(INSTALL)\bin $(INSTALL)\include\libvbucket $(INSTALL)\include $(INSTALL)
+
+$(INSTALL) $(INSTALL)\include $(INSTALL)\include\libvbucket $(INSTALL)\lib $(INSTALL)\bin:; -@mkdir $@
