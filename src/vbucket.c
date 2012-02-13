@@ -487,13 +487,30 @@ static int parse_from_memory(VBUCKET_CONFIG_HANDLE handle, const char *data) {
     return ret;
 }
 
+static int do_read_file(FILE *fp, char *data, size_t size)
+{
+    size_t offset = 0;
+    size_t nread;
+
+    do {
+        nread = fread(data + offset, 1, size, fp);
+        if (nread != (size_t)-1 && nread != 0) {
+            offset += nread;
+            size -= nread;
+        } else {
+            return -1;
+        }
+    } while (size > 0);
+
+    return 0;
+}
+
 static int parse_from_file(VBUCKET_CONFIG_HANDLE handle, const char *filename)
 {
     long size;
     char *data;
-    size_t nread;
     int ret;
-    FILE *f = fopen(filename, "r");
+    FILE *f = fopen(filename, "rb");
     if (f == NULL) {
         char msg[1024];
         snprintf(msg, sizeof(msg), "Unable to open file \"%s\": %s", filename,
@@ -514,15 +531,14 @@ static int parse_from_file(VBUCKET_CONFIG_HANDLE handle, const char *filename)
     data = calloc(size+1, sizeof(char));
     if (data == NULL) {
         char msg[1024];
-        snprintf(msg, sizeof(msg), "Filed to allocate buffer to read: \"%s\"", filename);
+        snprintf(msg, sizeof(msg), "Failed to allocate buffer to read: \"%s\"", filename);
         handle->errmsg = strdup(msg);
         fclose(f);
         return -1;
     }
-    nread = fread(data, sizeof(char), size+1, f);
-    if (nread != (size_t)size) {
+    if (do_read_file(f, data, size) == -1) {
         char msg[1024];
-        snprintf(msg, sizeof(msg), "Filed to read entire file: \"%s\": %s",
+        snprintf(msg, sizeof(msg), "Failed to read entire file: \"%s\": %s",
                  filename, strerror(errno));
         handle->errmsg = strdup(msg);
         fclose(f);

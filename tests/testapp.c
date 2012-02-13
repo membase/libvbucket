@@ -3,7 +3,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <limits.h>
 #include <sys/stat.h>
 
 #include <libvbucket/vbucket.h>
@@ -43,13 +42,13 @@ static const struct vb_st vbuckets[] =
 };
 
 static char *configPath(const char *fname) {
-    static char buffer[PATH_MAX];
+    static char buffer[FILENAME_MAX];
     char *root = getenv("srcdir");
     struct stat st;
 
-    sprintf(buffer, "%s/tests/config/testapp-%s", root, fname);
+    snprintf(buffer, FILENAME_MAX, "%s/tests/config/testapp-%s", root, fname);
     if (stat(buffer, &st) == -1) {
-        sprintf(buffer, "%s/tests/config/%s", root, fname);
+        snprintf(buffer, FILENAME_MAX, "%s/tests/config/%s", root, fname);
         if (stat(buffer, &st) == -1) {
             fprintf(stderr, "cannot find config %s\n", fname);
             abort();
@@ -288,5 +287,5 @@ int main(void) {
   testConfigUserPassword();
   testConfigCouchApiBase();
   testConfigDiffKetamaSame();
-  return 0;
+  exit(EXIT_SUCCESS);
 }

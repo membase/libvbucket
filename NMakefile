@@ -16,14 +16,14 @@
 
 CC_NODEBUG = cl.exe /O2 /DNDEBUG /MD /LD
 CC_DEBUG = cl.exe /Od /D_DEBUG /RTC1 /Z7 /LDd /W3 /MDd
-CFLAGS = /Iinclude /Iwin32 /nologo /W3 /EHsc /DWIN32 /FD /c -D_CRT_SECURE_NO_WARNINGS -DBUILDING_LIBVBUCKET=1
+CFLAGS = /Iinclude /I. /Iwin32 /nologo /W3 /EHsc /DWIN32 /FD /c -D_CRT_SECURE_NO_WARNINGS -DBUILDING_LIBVBUCKET=1
 LDFLAGS = /nologo /dll /incremental:no /opt:ref,icf /version:1.0
 LD = link.exe
 RM = del
 
-libvbucket_SOURCES= src\crc32.c src\cJSON.c src\vbucket.c src/ketama.c
+libvbucket_SOURCES= src\crc32.c src\cJSON.c src\vbucket.c src\ketama.c src\rfc1321\md5c.c
 vbucketkeygen_SOURCES = src\vbucketkeygen.c
-testketama_SOURCES = tests\testketama.c
+testketama_SOURCES = tests\testketama.c src\ketama.c src\rfc1321\md5c.c
 regression_SOURCES = tests\regression.c
 testapp_SOURCES = tests\testapp.c
 vbuckettool_SOURCES=src\vbuckettool.c
@@ -34,11 +34,11 @@ vbuckettool_SOURCES=src\vbuckettool.c
 libvbucket_la_OBJECTS=$(libvbucket_SOURCES:.c=.obj)
 libvbucket_la_debug_OBJECTS=$(libvbucket_SOURCES:.c=.dobj)
 
-vbucketkeygen_OBJECTS=$(vbuckettool_SOURCES:.c=.obj)
-testketama_OBJECTS=$(testketama_SOURCES:.c=.obj)
-regression_OBJECTS=$(regression_SOURCES:.c=.obj)
-testapp_OBJECTS=$(testapp_SOURCES:.c=.obj)
-vbuckettool_OBJECTS=$(vbuckettool_SOURCES:.c=.obj)
+vbucketkeygen_OBJECTS=$(vbuckettool_SOURCES:.c=.dobj)
+testketama_OBJECTS=$(testketama_SOURCES:.c=.dobj)
+regression_OBJECTS=$(regression_SOURCES:.c=.dobj)
+testapp_OBJECTS=$(testapp_SOURCES:.c=.dobj)
+vbuckettool_OBJECTS=$(vbuckettool_SOURCES:.c=.dobj)
 
 all_OBJS=$(vbucketkeygen_OBJECTS) $(testketama_OBJECTS) \
          $(testketama_OBJECTS) $(regression_OBJECTS) \
@@ -53,7 +53,8 @@ all: libvbucket_debug.dll \
      $(bin_PROGRAMS)
 
 check: $(check_PROGRAMS)
-    @echo "Todo: port the tests and run them"
+    set srcdir=.
+    for %%t in ($(check_PROGRAMS)) do %t
 
 libvbucket.dll: $(libvbucket_la_OBJECTS)
 	$(LD) $(LDFLAGS) /out:libvbucket.dll $(libvbucket_la_OBJECTS)
