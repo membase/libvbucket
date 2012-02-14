@@ -65,9 +65,28 @@ Development files for the vbucket library for Couchbase.
 %{_mandir}/**/*
 
 %changelog
+* Tue Feb 14 2012 Matt Ingenthron <matt@couchbase.com> - 1.8.0.2
+[Matt Ingenthron]
+- Updated package metadata for 1.8.0.2 release.
+
+[Pierre Joye]
+- Fix windows build on <vc10
+
+[Sergey Avseyev]
+- Fix vbucket_compare() for ketama distribution
+- Fill REST api hostname for Ketama distribution
+- make test more portable (for windows)
+
+[Trond Norbye]
+- Add an MT-safe creation interface
+- Fixed memory leak
+- Fix up NMakefile
+- Fix visibility attribute for compiling
+
 * Sun Jan 22 2012 Sergey Avseyev <sergey.avseyev@gmail.com> - 1.8.0.1
 - Unbundled release from Couchbase Server 1.8.0.  This release allows
   for libvbucket to be installed in common locations.  There have been
   minor changes to support portability to c89 based systems.
+
 * Mon Dec 05 2011 Sergey Avseyev <sergey.avseyev@gmail.com> - 1.7.2
 - Initial packaging

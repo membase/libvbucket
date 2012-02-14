@@ -5,8 +5,8 @@ Build-Depends: debhelper (>= 7.0.50~), autotools-dev
 Standards-Version: 3.9.2
 Section: libs
 Homepage: http://www.couchbase.com
-Vcs-Browser: https://github.com/membase/libvbucket
-Vcs-Git: git://github.com/membase/libvbucket.git
+Vcs-Browser: https://github.com/couchbase/libvbucket
+Vcs-Git: git://github.com/couchbase/libvbucket.git
 
 Package: libvbucket-dev
 Section: libdevel
