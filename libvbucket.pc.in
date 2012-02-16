@@ -6,6 +6,6 @@ includedir=@includedir@
 Name: libvbucket
 Description: A vbucket library for memcached
 Version: @VERSION@
-Requires.private: libmemcached
 Libs: -L${libdir} -lvbucket
+Libs.private: -lm
 Cflags: -I${includedir}/libvbucket
