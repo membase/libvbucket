@@ -65,6 +65,13 @@ Development files for the vbucket library for Couchbase.
 %{_mandir}/**/*
 
 %changelog
+* Tue Mar 06 2012 Sergey Avseyev <sergey@couchbase.com> - 1.8.0.3
+[Mark Nunberg]
+- Fixed libvbucket.pc.in
+
+[Sergey Avseyev]
+- Always sign deb packages
+
 * Tue Feb 14 2012 Matt Ingenthron <matt@couchbase.com> - 1.8.0.2
 [Matt Ingenthron]
 - Updated package metadata for 1.8.0.2 release.

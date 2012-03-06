@@ -1,3 +1,13 @@
+libvbucket (1.8.0.3) stable; urgency=low
+
+  [Mark Nunberg]
+  * Fixed libvbucket.pc.in
+
+  [Sergey Avseyev]
+  * Always sign deb packages
+
+ -- Sergey Avseyev <sergey@couchbase.com>  Tue, 06 Mar 2012 16:24:28 +0300
+
 libvbucket (1.8.0.2) stable; urgency=low
 
   * Update to unbundled release from Couchbase Server 1.8.0.
