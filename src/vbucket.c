@@ -138,7 +138,7 @@ void vbucket_config_destroy(VBUCKET_CONFIG_HANDLE vb) {
     free(vb->vbuckets);
     free(vb->continuum);
     free(vb->errmsg);
-    memset(vb, 0xff, sizeof(vb));
+    memset(vb, 0xff, sizeof(struct vbucket_config_st));
     free(vb);
 }
 
