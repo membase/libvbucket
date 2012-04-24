@@ -80,7 +80,7 @@ vbucket_get_master.3vbucket: docs/vbucket.pod
 vbucket_get_replica.3vbucket: docs/vbucket.pod
 	${POD2MAN} -c "$*" -r "" -s 3lib $< $@
 
-noinst_LTLIBRARIES = libketama.la
+noinst_LTLIBRARIES = libketama.la libcrc32.la
 
 lib_LTLIBRARIES = libvbucket.la
 
@@ -92,14 +92,17 @@ TESTS = ${check_PROGRAMS}
 
 # Test application to test stuff from C
 testapp_SOURCES = tests/testapp.c tests/macros.h
+testapp_CFLAGS = $(AM_CFLAGS) $(NO_WERROR)
 testapp_DEPENDENCIES= libvbucket.la
 testapp_LDADD= libvbucket.la
 
 regression_SOURCES = tests/regression.c tests/macros.h
+regression_CFLAGS = $(AM_CFLAGS) $(NO_WERROR)
 regression_DEPENDENCIES= libvbucket.la
 regression_LDADD= libvbucket.la
 
 testketama_SOURCES = tests/testketama.c tests/macros.h
+testketama_CFLAGS = $(AM_CFLAGS) $(NO_WERROR)
 testketama_DEPENDENCIES= libvbucket.la libketama.la
 testketama_LDADD= libvbucket.la libketama.la
 
@@ -109,8 +112,10 @@ EXTRA_DIST += tests/config
 libketama_la_SOURCES = src/ketama.c
 libketama_la_CFLAGS =  $(AM_CFLAGS) ${NO_WERROR}
 
+libcrc32_la_SOURCES = src/crc32.c
+libcrc32_la_CFLAGS = $(AM_CFLAGS) ${NO_WERROR}
+
 libvbucket_la_SOURCES= \
-                        src/crc32.c \
                         src/hash.h \
                         src/cJSON.c \
                         src/cJSON.h \
@@ -122,8 +127,8 @@ libvbucket_la_SOURCES= \
 # http://www.gnu.org/software/libtool/manual/libtool.html#Libtool-versioning
 #
 libvbucket_la_LDFLAGS= -version-info $(LIBVBUCKET_API_CURRENT):$(LIBVBUCKET_API_REVISION):$(LIBVBUCKET_API_AGE) -no-undefined
-libvbucket_la_LIBADD = libketama.la
-libvbucket_la_DEPENDENCIES = libketama.la
+libvbucket_la_LIBADD = libketama.la libcrc32.la
+libvbucket_la_DEPENDENCIES = libketama.la libcrc32.la
 
 vbuckettool_SOURCES = src/vbuckettool.c
 vbuckettool_DEPENDENCIES= libvbucket.la
