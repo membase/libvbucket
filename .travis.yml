@@ -1,0 +1,9 @@
+# there no C language yet
+language: python
+
+script: |
+  ./config/autorun.sh && ./configure && make check
+
+notifications:
+  email:
+    - sdk_dev@couchbase.com
