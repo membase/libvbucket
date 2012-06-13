@@ -1,3 +1,20 @@
+libvbucket (1.8.0.4) stable; urgency=low
+
+  [Aliaksey Kandratsenka]
+  * don't mess with optimization flags unless asked
+  * don't mess with -pipe flag
+  * check if -fvisibility is supported before using it
+
+  [Sergey Avseyev]
+  * Fix clang warning
+  * Add travis integration
+  * Fix tests on windows: testketama and testapp
+
+  [Trond Norbye]
+  * Work around problems with strict c89 mode on Sun Studio compilers
+
+ -- Sergey Avseyev <sergey@couchbase.com>  Wed, 13 Jun 2012 20:23:26 +0300
+
 libvbucket (1.8.0.3) stable; urgency=low
 
   [Mark Nunberg]

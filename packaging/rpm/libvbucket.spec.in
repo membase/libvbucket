@@ -65,6 +65,20 @@ Development files for the vbucket library for Couchbase.
 %{_mandir}/**/*
 
 %changelog
+* Wed Jun 13 2012 Sergey Avseyev <sergey@couchbase.com> - 1.8.0.4
+[Aliaksey Kandratsenka]
+- don't mess with optimization flags unless asked
+- don't mess with -pipe flag
+- check if -fvisibility is supported before using it
+
+[Sergey Avseyev]
+- Fix clang warning
+- Add travis integration
+- Fix tests on windows: testketama and testapp
+
+[Trond Norbye]
+- Work around problems with strict c89 mode on Sun Studio compilers
+
 * Tue Mar 06 2012 Sergey Avseyev <sergey@couchbase.com> - 1.8.0.3
 [Mark Nunberg]
 - Fixed libvbucket.pc.in

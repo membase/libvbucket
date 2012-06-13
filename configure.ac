@@ -59,7 +59,7 @@ AS_IF([test "x$ac_cv_header_stdint_h" != "xyes"],
 # http://www.gnu.org/software/libtool/manual/libtool.html#Libtool-versioning
 #
 LIBVBUCKET_API_CURRENT=2
-LIBVBUCKET_API_REVISION=0
+LIBVBUCKET_API_REVISION=1
 LIBVBUCKET_API_AGE=1
 AC_SUBST(LIBVBUCKET_API_CURRENT)
 AC_SUBST(LIBVBUCKET_API_REVISION)
