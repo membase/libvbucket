@@ -127,6 +127,14 @@ static void testWrongServer(const char *fname) {
     vbucket_config_destroy(vb);
 }
 
+static void testWrongNumVbuckets(const char *fname) {
+    VBUCKET_CONFIG_HANDLE vb = vbucket_config_create();
+    assert(vb != NULL);
+    assert(vbucket_config_parse(vb, LIBVBUCKET_SOURCE_FILE, configPath(fname)) != 0);
+    assert(strcmp(vbucket_get_error_message(vb), "Number of vBuckets must be a power of two > 0 and <= 65536") == 0);
+    vbucket_config_destroy(vb);
+}
+
 static void testWrongServerFFT(const char *fname) {
     VBUCKET_CONFIG_HANDLE vb = vbucket_config_parse_file(configPath(fname));
     int rv = 0;
@@ -283,6 +291,7 @@ int main(void) {
   testConfig("config-in-envelope-fft");
   testWrongServer("config");
   testWrongServerFFT("config-in-envelope-fft");
+  testWrongNumVbuckets("config-wrong-num-vbuckets");
   testConfigDiff();
   testConfigDiffSame();
   testConfigUserPassword();

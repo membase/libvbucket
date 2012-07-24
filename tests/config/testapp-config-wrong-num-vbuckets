@@ -1,0 +1,16 @@
+{
+  "hashAlgorithm": "CRC",
+  "numReplicas": 2,
+  "serverList": [
+    "server1:11211",
+    "server2:11210",
+    "server3:11211"
+  ],
+  "vBucketMap": [
+    [ 2, 1, 0 ],
+    [ 0, 1, 2 ],
+    [ 1, 2, 0 ],
+    [ 2, 1, -1 ],
+    [ 1, 2, 0 ]
+  ]
+}

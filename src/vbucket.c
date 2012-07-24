@@ -31,10 +31,11 @@
 #include <libvbucket/vbucket.h>
 
 #define MAX_CONFIG_SIZE 100 * 1048576
-#define MAX_BUCKETS 65536
+#define MAX_VBUCKETS 65536
 #define MAX_REPLICAS 4
 #define MAX_AUTORITY_SIZE 100
-#define STRINGIFY(X) #X
+#define STRINGIFY_(X) #X
+#define STRINGIFY(X) STRINGIFY_(X)
 
 struct server_st {
     char *authority;        /* host:port */
@@ -350,7 +351,7 @@ static int parse_vbucket_config(VBUCKET_CONFIG_HANDLE vb, cJSON *c)
     }
     vb->num_vbuckets = cJSON_GetArraySize(json);
     if (vb->num_vbuckets == 0 || (vb->num_vbuckets & (vb->num_vbuckets - 1)) != 0) {
-        vb->errmsg = strdup("Number of buckets must be a power of two > 0 and <= " STRINGIFY(MAX_BUCKETS));
+        vb->errmsg = strdup("Number of vBuckets must be a power of two > 0 and <= " STRINGIFY(MAX_VBUCKETS));
         return -1;
     }
     vb->mask = vb->num_vbuckets - 1;
