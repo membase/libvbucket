@@ -16,7 +16,7 @@
 ACLOCAL_AMFLAGS = -I m4 --force
 
 bin_PROGRAMS = vbuckettool vbucketkeygen
-EXTRA_DIST = docs Doxyfile LICENSE README.markdown src/rfc1321
+EXTRA_DIST = docs Doxyfile LICENSE README.markdown src/rfc1321 NMakefile
 
 pkginclude_HEADERS = \
                      include/libvbucket/vbucket.h \
