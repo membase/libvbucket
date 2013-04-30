@@ -2,13 +2,6 @@
 #include <stdlib.h>
 #include "hash.h"
 
-/* Force md5 functions to be static. The compiler could show warnings but
- * it ok, we did it because we need to keep files in vendor/ directory
- * unmodified. */
-static void MD5Init();
-static void MD5Update();
-static void MD5Final();
-
 /* This library uses the reference MD5 implementation from [RFC1321] */
 #define PROTOTYPES 1
 #include "rfc1321/md5c.c"

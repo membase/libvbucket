@@ -1,7 +1,0 @@
-#!/usr/bin/make -f
-
-%:
-	dh $@
-
-override_dh_strip:
-	dh_strip --dbg-package=libvbucket1-dbg

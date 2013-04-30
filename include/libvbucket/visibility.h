@@ -17,18 +17,27 @@
 #ifndef LIBVBUCKET_VISIBILITY_H
 #define LIBVBUCKET_VISIBILITY_H 1
 
+#ifdef BUILDING_LIBVBUCKET
+
 #if defined (__SUNPRO_C) && (__SUNPRO_C >= 0x550)
 #define LIBVBUCKET_PUBLIC_API __global
 #elif defined __GNUC__
 #define LIBVBUCKET_PUBLIC_API __attribute__ ((visibility("default")))
 #elif defined(_MSC_VER)
-#ifdef BUILDING_LIBVBUCKET
 #define LIBVBUCKET_PUBLIC_API extern __declspec(dllexport)
 #else
-#define LIBVBUCKET_PUBLIC_API extern __declspec(dllimport)
+/* unknown compiler */
+#define LIBVBUCKET_PUBLIC_API
 #endif
+
+#else
+
+#if defined(_MSC_VER)
+#define LIBVBUCKET_PUBLIC_API extern __declspec(dllimport)
 #else
 #define LIBVBUCKET_PUBLIC_API
+#endif
+
 #endif
 
 #endif /* LIBVBUCKET_VISIBILITY_H */

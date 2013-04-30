@@ -14,13 +14,10 @@
  *   See the License for the specific language governing permissions and
  *   limitations under the License.
  */
-
 #ifndef LIBVBUCKET_HASH_H
 #define LIBVBUCKET_HASH_H 1
 
-#include "config.h"
-
-#ifndef HAVE_STDINT_H
+#ifdef WIN32
 #include "win_stdint.h"
 #else
 #include <stdint.h>

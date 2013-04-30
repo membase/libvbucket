@@ -23,6 +23,29 @@
 #ifndef cJSON__h
 #define cJSON__h
 
+#ifdef BUILDING_CJSON
+
+#if defined (__SUNPRO_C) && (__SUNPRO_C >= 0x550)
+#define CJSON_PUBLIC_API __global
+#elif defined __GNUC__
+#define CJSON_PUBLIC_API __attribute__ ((visibility("default")))
+#elif defined(_MSC_VER)
+#define CJSON_PUBLIC_API __declspec(dllexport)
+#else
+/* unknown compiler */
+#define CJSON_PUBLIC_API
+#endif
+
+#else
+
+#if defined(_MSC_VER)
+#define CJSON_PUBLIC_API __declspec(dllimport)
+#else
+#define CJSON_PUBLIC_API
+#endif
+
+#endif
+
 #ifdef __cplusplus
 extern "C"
 {
@@ -66,61 +89,90 @@ typedef struct cJSON_Hooks {
 } cJSON_Hooks;
 
 /* Supply malloc, realloc and free functions to cJSON */
+CJSON_PUBLIC_API
 extern void cJSON_InitHooks(cJSON_Hooks* hooks);
 
 
 /* Supply a block of JSON, and this returns a cJSON object you can
    interrogate. Call cJSON_Delete when finished. */
+CJSON_PUBLIC_API
 extern cJSON *cJSON_Parse(const char *value);
 /* Render a cJSON entity to text for transfer/storage. Free the char*
    when finished. */
+CJSON_PUBLIC_API
 extern char  *cJSON_Print(cJSON *item);
 /* Render a cJSON entity to text for transfer/storage without any
    formatting. Free the char* when finished. */
+CJSON_PUBLIC_API
 extern char  *cJSON_PrintUnformatted(cJSON *item);
 /* Delete a cJSON entity and all subentities. */
+CJSON_PUBLIC_API
 extern void   cJSON_Delete(cJSON *c);
 
 /* Returns the number of items in an array (or object). */
-extern int        cJSON_GetArraySize(cJSON *array);
+CJSON_PUBLIC_API
+extern int    cJSON_GetArraySize(cJSON *array);
 /* Retrieve item number "item" from array "array". Returns NULL if
    unsuccessful. */
+CJSON_PUBLIC_API
 extern cJSON *cJSON_GetArrayItem(cJSON *array,int item);
 /* Get item "string" from object. Case insensitive. */
+CJSON_PUBLIC_API
 extern cJSON *cJSON_GetObjectItem(cJSON *object,const char *string);
 
 /* These calls create a cJSON item of the appropriate type. */
+CJSON_PUBLIC_API
 extern cJSON *cJSON_CreateNull(void);
+CJSON_PUBLIC_API
 extern cJSON *cJSON_CreateTrue(void);
+CJSON_PUBLIC_API
 extern cJSON *cJSON_CreateFalse(void);
+CJSON_PUBLIC_API
 extern cJSON *cJSON_CreateNumber(double num);
+CJSON_PUBLIC_API
 extern cJSON *cJSON_CreateString(const char *string);
+CJSON_PUBLIC_API
 extern cJSON *cJSON_CreateArray(void);
+CJSON_PUBLIC_API
 extern cJSON *cJSON_CreateObject(void);
 
 /* These utilities create an Array of count items. */
+CJSON_PUBLIC_API
 extern cJSON *cJSON_CreateIntArray(int *numbers,int count);
+CJSON_PUBLIC_API
 extern cJSON *cJSON_CreateFloatArray(float *numbers,int count);
+CJSON_PUBLIC_API
 extern cJSON *cJSON_CreateDoubleArray(double *numbers,int count);
+CJSON_PUBLIC_API
 extern cJSON *cJSON_CreateStringArray(const char **strings,int count);
 
 /* Append item to the specified array/object. */
+CJSON_PUBLIC_API
 extern void cJSON_AddItemToArray(cJSON *array, cJSON *item);
+CJSON_PUBLIC_API
 extern void cJSON_AddItemToObject(cJSON *object,const char *string,cJSON *item);
 /* Append reference to item to the specified array/object. Use this
    when you want to add an existing cJSON to a new cJSON, but don't
    want to corrupt your existing cJSON. */
+CJSON_PUBLIC_API
 extern void cJSON_AddItemReferenceToArray(cJSON *array, cJSON *item);
+CJSON_PUBLIC_API
 extern void cJSON_AddItemReferenceToObject(cJSON *object,const char *string,cJSON *item);
 
 /* Remove/Detatch items from Arrays/Objects. */
+CJSON_PUBLIC_API
 extern cJSON *cJSON_DetachItemFromArray(cJSON *array,int which);
+CJSON_PUBLIC_API
 extern void   cJSON_DeleteItemFromArray(cJSON *array,int which);
+CJSON_PUBLIC_API
 extern cJSON *cJSON_DetachItemFromObject(cJSON *object,const char *string);
+CJSON_PUBLIC_API
 extern void   cJSON_DeleteItemFromObject(cJSON *object,const char *string);
 
 /* Update array items. */
+CJSON_PUBLIC_API
 extern void cJSON_ReplaceItemInArray(cJSON *array,int which,cJSON *newitem);
+CJSON_PUBLIC_API
 extern void cJSON_ReplaceItemInObject(cJSON *object,const char *string,cJSON *newitem);
 
 #define cJSON_AddNullToObject(object,name)      cJSON_AddItemToObject(object, name, cJSON_CreateNull())

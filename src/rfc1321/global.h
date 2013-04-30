@@ -10,9 +10,7 @@
 #define PROTOTYPES 0
 #endif
 
-#include "config.h"
-
-#ifndef HAVE_STDINT_H
+#ifdef WIN32
 #include "win_stdint.h"
 #else
 #include <stdint.h>

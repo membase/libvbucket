@@ -1,5 +1,4 @@
 /* -*- Mode: C; tab-width: 4; c-basic-offset: 4; indent-tabs-mode: nil -*- */
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -27,7 +26,9 @@ static const struct key_st keys[] =
     { NULL, -1 }
 };
 
-static const char *servers[] = { "server1:11211", "server2:11210", "server3:11211" };
+static const char *servers[] = { "server1:11211",
+                                 "server2:11210",
+                                 "server3:11211" };
 
 struct vb_st {
     int master;
@@ -44,10 +45,15 @@ static const struct vb_st vbuckets[] =
 
 static char *configPath(const char *fname) {
     static char buffer[FILENAME_MAX];
-    char *root = getenv("srcdir");
+    const char *root = getenv("CMAKE_CURRENT_SOURCE_DIR");
     struct stat st;
 
-    snprintf(buffer, FILENAME_MAX, "%s/tests/config/testapp-%s", root, fname);
+    if (root == NULL) {
+        root = ".";
+    }
+
+    snprintf(buffer, FILENAME_MAX, "%s/tests/config/testapp-%s",
+             root, fname);
     if (stat(buffer, &st) == -1) {
         snprintf(buffer, FILENAME_MAX, "%s/tests/config/%s", root, fname);
         if (stat(buffer, &st) == -1) {
@@ -55,6 +61,7 @@ static char *configPath(const char *fname) {
             abort();
         }
     }
+
     return buffer;
 }
 
@@ -65,7 +72,8 @@ static void testConfig(const char *fname) {
 
     VBUCKET_CONFIG_HANDLE vb = vbucket_config_parse_file(configPath(fname));
     if (vb == NULL) {
-        fprintf(stderr, "vbucket_config_parse_file error: %s\n", vbucket_get_error());
+        fprintf(stderr, "vbucket_config_parse_file error: %s\n",
+                vbucket_get_error());
         abort();
     }
 
@@ -105,7 +113,8 @@ static void testConfig(const char *fname) {
 static void testWrongServer(const char *fname) {
     VBUCKET_CONFIG_HANDLE vb = vbucket_config_parse_file(configPath(fname));
     if (vb == NULL) {
-        fprintf(stderr, "vbucket_config_parse_file error: %s\n", vbucket_get_error());
+        fprintf(stderr, "vbucket_config_parse_file error: %s\n",
+                vbucket_get_error());
         abort();
     }
 
@@ -131,7 +140,8 @@ static void testWrongNumVbuckets(const char *fname) {
     VBUCKET_CONFIG_HANDLE vb = vbucket_config_create();
     assert(vb != NULL);
     assert(vbucket_config_parse(vb, LIBVBUCKET_SOURCE_FILE, configPath(fname)) != 0);
-    assert(strcmp(vbucket_get_error_message(vb), "Number of vBuckets must be a power of two > 0 and <= 65536") == 0);
+    assert(strcmp(vbucket_get_error_message(vb),
+                  "Number of vBuckets must be a power of two > 0 and <= 65536") == 0);
     vbucket_config_destroy(vb);
 }
 
@@ -142,7 +152,8 @@ static void testWrongServerFFT(const char *fname) {
     int i = 0;
 
     if (vb == NULL) {
-        fprintf(stderr, "vbucket_config_parse_file error: %s\n", vbucket_get_error());
+        fprintf(stderr, "vbucket_config_parse_file error: %s\n",
+                vbucket_get_error());
         abort();
     }
 
@@ -283,7 +294,14 @@ static void testConfigCouchApiBase(void)
     assert(strcmp(vbucket_config_get_server(vb, 2), "192.168.2.123:12004") == 0);
 }
 
-int main(void) {
+int main(int argc, char **argv)
+{
+    char buffer[1024];
+    if (argc > 1 && getenv("CMAKE_CURRENT_SOURCE_DIR") == NULL) {
+        snprintf(buffer, sizeof(buffer), "CMAKE_CURRENT_SOURCE_DIR=%s",
+                 argv[1]);
+        putenv(buffer);
+    }
   testConfig("config");
   testConfig("config-flat");
   testConfig("config-in-envelope");
