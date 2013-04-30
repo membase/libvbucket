@@ -38,17 +38,6 @@ AC_SEARCH_LIBS(floor, m)
 AC_SEARCH_LIBS(pow, m)
 AC_SEARCH_LIBS(fabs, m)
 
-AC_ARG_WITH([docs],
-  [AS_HELP_STRING([--with-docs],
-    [Generate documentation (yes|no) @<:@default=yes@:>@])],
-  [with_docs=$withval],
-  [with_docs=yes])
-
-AC_PATH_PROG(POD2MAN, pod2man, missing)
-AS_IF([test "$with_docs" = "yes" -a "$POD2MAN" = "missing" ],
-      [ AC_MSG_ERROR([pod2man is required for building docs])])
-AM_CONDITIONAL(BUILD_DOCS, test "$with_docs" = "yes")
-
 AC_CHECK_HEADERS_ONCE([stdint.h])
 AS_IF([test "x$ac_cv_header_stdint_h" != "xyes"],
       [AC_MSG_ERROR(Failed to locate stdint.h)])
@@ -68,13 +57,3 @@ dnl ----------------------------------------------------------------------------
 
 AC_CONFIG_FILES(Makefile libvbucket.pc)
 AC_OUTPUT
-AS_IF(test "$with_docs" = "no",
-  [
-    echo "*****"
-    echo "*"
-    echo "*  WARNING: You are not generating any documentation."
-    echo "*           Please don't ship libvbucket to an end user"
-    echo "*           without documentation..."
-    echo "*"
-    echo "*****"
-  ])
