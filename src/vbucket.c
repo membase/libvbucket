@@ -28,7 +28,7 @@
 #define MAX_CONFIG_SIZE 100 * 1048576
 #define MAX_VBUCKETS 65536
 #define MAX_REPLICAS 4
-#define MAX_AUTORITY_SIZE 100
+#define MAX_AUTHORITY_SIZE 100
 #define STRINGIFY_(X) #X
 #define STRINGIFY(X) STRINGIFY_(X)
 
@@ -84,7 +84,7 @@ static int continuum_item_cmp(const void *t1, const void *t2)
 
 static void update_ketama_continuum(VBUCKET_CONFIG_HANDLE vb)
 {
-    char host[MAX_AUTORITY_SIZE+10] = "";
+    char host[MAX_AUTHORITY_SIZE+10] = "";
     int nhost;
     int pp, hh, ss, nn;
     unsigned char digest[16];
@@ -97,7 +97,7 @@ static void update_ketama_continuum(VBUCKET_CONFIG_HANDLE vb)
     for (ss = 0, pp = 0; ss < vb->num_servers; ++ss) {
         /* we can add more points to server which have more memory */
         for (hh = 0; hh < 40; ++hh) {
-            nhost = snprintf(host, MAX_AUTORITY_SIZE+10, "%s-%u",
+            nhost = snprintf(host, MAX_AUTHORITY_SIZE+10, "%s-%u",
                              vb->servers[ss].authority, hh);
             hash_md5(host, nhost, digest);
             for (nn = 0; nn < 4; ++nn, ++pp) {
@@ -201,12 +201,12 @@ static int lookup_server_struct(struct vbucket_config_st *vb, cJSON *c) {
     char *authority = NULL;
     int idx = -1, ii;
 
-    authority = calloc(MAX_AUTORITY_SIZE, sizeof(char));
+    authority = calloc(MAX_AUTHORITY_SIZE, sizeof(char));
     if (authority == NULL) {
         vb->errmsg = strdup("Failed to allocate storage for authority string");
         return -1;
     }
-    if (get_node_authority(vb, c, authority, MAX_AUTORITY_SIZE) < 0) {
+    if (get_node_authority(vb, c, authority, MAX_AUTHORITY_SIZE) < 0) {
         free(authority);
         return -1;
     }
@@ -399,12 +399,12 @@ static int parse_ketama_config(VBUCKET_CONFIG_HANDLE vb, cJSON *config)
             vb->errmsg = strdup("Expected object for nodes array item");
             return -1;
         }
-        buf = calloc(MAX_AUTORITY_SIZE, sizeof(char));
+        buf = calloc(MAX_AUTHORITY_SIZE, sizeof(char));
         if (buf == NULL) {
             vb->errmsg = strdup("Failed to allocate storage for node authority");
             return -1;
         }
-        if (get_node_authority(vb, node, buf, MAX_AUTORITY_SIZE) < 0) {
+        if (get_node_authority(vb, node, buf, MAX_AUTHORITY_SIZE) < 0) {
             return -1;
         }
         vb->servers[ii].authority = buf;
