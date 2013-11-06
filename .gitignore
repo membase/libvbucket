@@ -8,7 +8,7 @@
 /CTestTestfile.cmake
 /Makefile
 /Testing/
-/cJSON.dll
+/cJSON.dll*
 /cJSON.lib
 /cmake_install.cmake
 /core*
@@ -20,7 +20,7 @@
 /libvbucket_regression
 /libvbucket_testapp
 /libvbucket_testketama
-/vbucket.dll
+/vbucket.dll*
 /vbucket.lib
 /vbucketkeygen
 /vbuckettool
