@@ -23,11 +23,13 @@ ELSE (WIN32)
     TARGET_LINK_LIBRARIES(vbucket cJSON m)
 ENDIF (WIN32)
 
+IF (INSTALL_HEADER_FILES)
 INSTALL(FILES
         include/libvbucket/vbucket.h
         include/libvbucket/visibility.h
         DESTINATION include/libvbucket)
 INSTALL(FILES include/cJSON.h DESTINATION include)
+ENDIF(INSTALL_HEADER_FILES)
 
 INSTALL(TARGETS vbucket cJSON
   RUNTIME DESTINATION bin
