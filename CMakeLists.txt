@@ -61,6 +61,9 @@ TARGET_LINK_LIBRARIES(vbucketkeygen vbucket)
 #
 # The tests. These are automatically executed as part of the build!
 #
+ADD_EXECUTABLE(libvbucket_cjson_test include/cJSON.h tests/cjson_test.c)
+TARGET_LINK_LIBRARIES(libvbucket_cjson_test cJSON)
+
 ADD_EXECUTABLE(libvbucket_testapp
                include/libvbucket/vbucket.h
                include/libvbucket/visibility.h
@@ -82,6 +85,7 @@ ADD_EXECUTABLE(libvbucket_testketama
                tests/testketama.c)
 TARGET_LINK_LIBRARIES(libvbucket_testketama vbucket)
 
+ADD_TEST(libvbucket-cjson-test libvbucket_cjson_test)
 ADD_TEST(libvbucket-basic-tests libvbucket_testapp ${CMAKE_CURRENT_SOURCE_DIR})
 ADD_TEST(libvbucket-regression-tests libvbucket_regression ${CMAKE_CURRENT_SOURCE_DIR})
 ADD_TEST(libvbucket-ketama-tests libvbucket_testketama)

@@ -105,6 +105,9 @@ extern char  *cJSON_Print(cJSON *item);
    formatting. Free the char* when finished. */
 CJSON_PUBLIC_API
 extern char  *cJSON_PrintUnformatted(cJSON *item);
+/* Release the memory returned by cJSON_Print and cJSON_PrintUnformatted */
+CJSON_PUBLIC_API
+extern void   cJSON_Free(char *ptr);
 /* Delete a cJSON entity and all subentities. */
 CJSON_PUBLIC_API
 extern void   cJSON_Delete(cJSON *c);

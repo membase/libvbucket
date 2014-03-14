@@ -241,6 +241,8 @@ cJSON *cJSON_Parse(const char *value)
 char *cJSON_Print(cJSON *item)				{return print_value(item,0,1);}
 char *cJSON_PrintUnformatted(cJSON *item)	{return print_value(item,0,0);}
 
+void cJSON_Free(char *ptr) { free(ptr); }
+
 /* Parser core - when encountering text, process appropriately. */
 static const char *parse_value(cJSON *item,const char *value)
 {
